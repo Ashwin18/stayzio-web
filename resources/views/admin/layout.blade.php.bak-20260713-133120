@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="{{ $defaultLang->code ?? 'en' }}" dir="{{ (($defaultLang->direction ?? 0) == 1) ? 'rtl' : 'ltr' }}">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="csrf-token" content="{{ csrf_token() }}">
+<title>{{ __('Admin') }} | {{ optional($websiteInfo)->website_title ?? 'StayZio' }}</title>
+<link rel="shortcut icon" href="{{ asset('assets/img/'.(optional($websiteInfo)->favicon ?? 'favicon.png')) }}">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
+
+@include('admin.partials.styles')
+@yield('style')
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#f5f0e8;--navy2:#ffffff;--navy3:#f8f6f1;--navy4:#f1ede5;
+  --red:#e31e24;--red2:#ff3a40;--red-bg:rgba(227,30,36,.1);
+  --text:#1a1612;--muted:#6b6560;--border:#e8e2d9;
+  --green:#10b981;--amber:#f59e0b;--blue:#3b82f6;--purple:#8b5cf6;--cyan:#06b6d4;
+  --sidebar:240px;
+  --sidebar-collapsed:54px;
+  --sz-surface:#ffffff;--sz-surface2:#f8f6f1;--sz-border:#e8e2d9;
+  --sz-text:#1a1612;--sz-text2:#6b6560;--sz-muted:#6b6560;
+  --sz-red:#e31e24;--sz-green:#10b981;--sz-amber:#f59e0b;
+  --sz-blue:#3b82f6;--sz-purple:#8b5cf6;--sz-cyan:#06b6d4;
+  --sz-red-soft:rgba(227,30,36,.08);--sz-red-border:rgba(227,30,36,.3);
+  --sz-shadow:0 1px 4px rgba(0,0,0,.04);--sz-shadow2:0 4px 20px rgba(0,0,0,.1);
+}
+html,body{height:100%;overflow:hidden;background:#f5f0e8}
+body{display:flex!important;color:#1a1612;font-size:13px;font-family:'Inter',system-ui,sans-serif;margin:0!important;padding:0!important}
+/* Sidebar collapse */
+.sidebar{width:var(--sidebar)!important;background:#ffffff;border-right:1px solid #e8e2d9;display:flex!important;flex-direction:column!important;flex-shrink:0!important;height:100vh!important;transition:width .22s ease;overflow:hidden!important}
+.sidebar.sz-collapsed{width:var(--sidebar-collapsed)}
+.sidebar.sz-collapsed .sb-name,.sidebar.sz-collapsed .sb-role,.sidebar.sz-collapsed .sb-search,.sidebar.sz-collapsed .sb-group,.sidebar.sz-collapsed .sb-item .lbl,.sidebar.sz-collapsed .sb-item .arr,.sidebar.sz-collapsed .sb-item .badge-nav{opacity:0;overflow:hidden;white-space:nowrap}
+.sidebar.sz-collapsed .sb-sub{max-height:0!important;overflow:hidden}
+.sidebar.sz-collapsed .sb-item{justify-content:center;padding:9px 0}
+.sidebar.sz-collapsed .sb-item .icon{width:auto;margin:0}
+.sidebar.sz-collapsed .sb-logo{padding:12px;justify-content:center}
+.sz-hamburger{background:none;border:none;color:#6b6560;cursor:pointer;padding:5px 7px;border-radius:6px;font-size:19px;display:flex;align-items:center;transition:background .15s,color .15s}
+.sz-hamburger:hover{color:#1a1612;background:rgba(255,255,255,.06)}
+.sb-logo{padding:15px 14px 12px;display:flex;align-items:center;gap:10px;border-bottom:1px solid #e8e2d9}
+.sb-mark{width:30px;height:30px;background:var(--red);border-radius:7px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;color:#fff;flex-shrink:0}
+.sb-name{font-size:14px;font-weight:700;letter-spacing:-.3px}
+.sb-role{font-size:10px;color:#6b6560}
+.sb-search{padding:10px 12px;border-bottom:1px solid #e8e2d9}
+.sb-search input{width:100%;background:#f8f6f1;border:1px solid #e8e2d9;border-radius:7px;padding:6px 10px;color:#1a1612;font-size:12px;outline:none;transition:border-color .2s;font-family:inherit}
+.sb-search input:focus{border-color:var(--red)}
+.sb-search input::placeholder{color:#6b6560}
+.sb-nav{flex:1;overflow-y:auto;padding:6px 0 20px}
+.sb-nav::-webkit-scrollbar{width:2px}
+.sb-nav::-webkit-scrollbar-thumb{background:#f1ede5;border-radius:2px}
+.sb-group{padding:12px 14px 4px;font-size:9.5px;font-weight:700;color:#6b6560;letter-spacing:.1em;text-transform:uppercase}
+.sb-item{display:flex;align-items:center;gap:9px;padding:7px 14px;cursor:pointer;color:#6b6560;font-size:12.5px;font-weight:500;transition:color .15s,background .15s;position:relative;text-decoration:none}
+.sb-item:hover{background:rgba(0,0,0,.03);color:#1a1612}
+.sb-item.active{background:var(--red-bg);color:#e31e24}
+.sb-item.active::before{content:'';position:absolute;left:0;top:2px;bottom:2px;width:3px;background:var(--red);border-radius:0 3px 3px 0}
+.sb-item i.icon{width:18px;text-align:center;font-size:16px;flex-shrink:0}
+.sb-item .lbl{flex:1}
+.sb-item .badge-nav{font-size:9px;font-weight:700;padding:2px 6px;border-radius:10px;background:var(--red);color:#fff;min-width:16px;text-align:center}
+.sb-item .badge-nav.warn{background:var(--amber);color:#000}
+.sb-item .arr{font-size:11px;transition:transform .2s;color:#6b6560;flex-shrink:0}
+.sb-item.open .arr{transform:rotate(90deg)}
+.sb-sub{overflow:hidden;max-height:0;transition:max-height .25s ease}
+.sb-sub.open{max-height:500px}
+.sb-sub-item{display:flex;align-items:center;gap:8px;padding:5px 14px 5px 40px;cursor:pointer;color:#6b6560;font-size:12px;transition:color .15s,background .15s;text-decoration:none}
+.sb-sub-item:hover{color:#1a1612;background:rgba(255,255,255,.03)}
+.sb-sub-item.active{color:#1a1612}
+.sb-sub-item::before{content:'';width:5px;height:5px;border-radius:50%;background:currentColor;flex-shrink:0;opacity:.4}
+.sb-sub-item.active::before{opacity:1;background:var(--red)}
+.main{flex:1!important;display:flex!important;flex-direction:column!important;height:100vh!important;overflow:hidden!important;min-width:0}
+.topbar{height:52px;background:#ffffff;border-bottom:1px solid #e8e2d9;display:flex;align-items:center;padding:0 20px;gap:12px;flex-shrink:0}
+.tb-bc{display:flex;align-items:center;gap:6px;font-size:12px;color:#6b6560}
+.tb-bc .cur{color:#1a1612;font-weight:600}
+.tb-spacer{flex:1}
+.tb-btn{width:34px;height:34px;border-radius:8px;background:#f8f6f1;border:1px solid #e8e2d9;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#6b6560;font-size:15px;text-decoration:none;transition:color .15s}
+.tb-btn:hover{color:#1a1612}
+.tb-notif{position:relative}
+.tb-notif .dot{position:absolute;top:7px;right:7px;width:7px;height:7px;background:var(--red);border-radius:50%;border:2px solid #ffffff}
+.tb-avatar{width:32px;height:32px;border-radius:50%;background:var(--red);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;cursor:pointer;flex-shrink:0}
+.tb-uname{font-size:12px;font-weight:600}
+.content{flex:1;overflow-y:auto;padding:20px}
+.content::-webkit-scrollbar{width:4px}
+.content::-webkit-scrollbar-thumb{background:#f1ede5;border-radius:2px}
+.page-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px}
+.page-hdr-left h2{font-size:18px;font-weight:700;letter-spacing:-.3px}
+.page-hdr-left p{font-size:12px;color:#6b6560;margin-top:3px}
+.page-hdr-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;border:none;transition:opacity .15s,background .15s;font-family:inherit;text-decoration:none;white-space:nowrap}
+.btn:hover{opacity:.85}
+.btn-primary{background:var(--red);color:#fff}
+.btn-secondary{background:#f8f6f1;color:#1a1612;border:1px solid #e8e2d9}
+.btn-success{background:rgba(16,185,129,.15);color:var(--green);border:1px solid rgba(16,185,129,.3)}
+.btn-warn{background:rgba(245,158,11,.15);color:var(--amber);border:1px solid rgba(245,158,11,.3)}
+.btn-danger{background:rgba(227,30,36,.1);color:#f87171;border:1px solid rgba(227,30,36,.2)}
+.btn-info{background:rgba(59,130,246,.12);color:var(--blue);border:1px solid rgba(59,130,246,.25)}
+.btn-sm{padding:5px 11px;font-size:11.5px;border-radius:6px}
+.btn-xs{padding:3px 8px;font-size:11px;border-radius:5px}
+.btn-block{width:100%;justify-content:center}
+.card{background:#ffffff;border:1px solid #e8e2d9;border-radius:10px;overflow:hidden}
+.card-body{padding:16px}
+.card-hdr{padding:13px 16px;border-bottom:1px solid #e8e2d9;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.card-title{font-size:13px;font-weight:600}
+.card-sub{font-size:11px;color:#6b6560;margin-top:2px}
+.card-hdr-actions{display:flex;gap:8px;align-items:center}
+.kpi-grid{display:grid;gap:10px;margin-bottom:16px}
+.kpi-grid.g4{grid-template-columns:repeat(4,1fr)}
+.kpi-grid.g3{grid-template-columns:repeat(3,1fr)}
+.kpi-grid.g2{grid-template-columns:repeat(2,1fr)}
+.kpi{background:#ffffff;border:1px solid #e8e2d9;border-radius:10px;padding:14px 16px}
+.kpi-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px}
+.kpi-icon{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.kpi-icon.g{background:rgba(16,185,129,.12);color:var(--green)}
+.kpi-icon.r{background:rgba(227,30,36,.12);color:var(--red2)}
+.kpi-icon.a{background:rgba(245,158,11,.12);color:var(--amber)}
+.kpi-icon.b{background:rgba(59,130,246,.12);color:var(--blue)}
+.kpi-icon.p{background:rgba(139,92,246,.12);color:var(--purple)}
+.kpi-icon.c{background:rgba(6,182,212,.12);color:var(--cyan)}
+.delta{font-size:10px;padding:2px 7px;border-radius:6px;font-weight:600}
+.delta.up{background:rgba(16,185,129,.12);color:var(--green)}
+.delta.dn{background:rgba(227,30,36,.1);color:#f87171}
+.delta.neu{background:#f8f6f1;color:#6b6560}
+.kpi-val{font-size:22px;font-weight:700;letter-spacing:-.5px;line-height:1}
+.kpi-lbl{font-size:11px;color:#6b6560;margin-top:4px}
+.tbl-wrap{overflow-x:auto}
+.tbl-wrap::-webkit-scrollbar{height:4px}
+.tbl-wrap::-webkit-scrollbar-thumb{background:#f1ede5;border-radius:2px}
+table{width:100%;border-collapse:collapse}
+thead tr{border-bottom:1px solid #e8e2d9}
+th{padding:10px 12px;font-size:10.5px;font-weight:600;color:#6b6560;text-align:left;white-space:nowrap;text-transform:uppercase;letter-spacing:.05em}
+td{padding:11px 12px;font-size:12.5px;border-bottom:1px solid rgba(0,0,0,.03);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(0,0,0,.02)}
+.td-main{font-weight:600;font-size:13px;line-height:1.3}
+.td-sub{font-size:11px;color:#6b6560;margin-top:2px}
+.td-avatar{width:34px;height:34px;border-radius:8px;background:#f8f6f1;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#6b6560;flex-shrink:0}
+.td-pair{display:flex;align-items:center;gap:10px}
+.td-muted{color:#6b6560;font-size:12px}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:20px;font-size:10px;font-weight:600;white-space:nowrap}
+.badge::before{content:'';width:5px;height:5px;border-radius:50%;background:currentColor;flex-shrink:0}
+.badge.no-dot::before{display:none}
+.badge.green{background:rgba(16,185,129,.12);color:var(--green)}
+.badge.red{background:rgba(227,30,36,.1);color:#f87171}
+.badge.amber{background:rgba(245,158,11,.12);color:var(--amber)}
+.badge.blue{background:rgba(59,130,246,.12);color:var(--blue)}
+.badge.purple{background:rgba(139,92,246,.12);color:var(--purple)}
+.badge.cyan{background:rgba(6,182,212,.12);color:var(--cyan)}
+.badge.muted{background:#f8f6f1;color:#6b6560}
+.slot{padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700}
+.slot.s3{background:rgba(227,30,36,.12);color:#ff8a8e}
+.slot.s6{background:rgba(59,130,246,.12);color:#7eb8f7}
+.slot.s12{background:rgba(139,92,246,.12);color:#b49ff8}
+.slot.sf{background:rgba(16,185,129,.12);color:#6ee7b7}
+.av{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
+.av.red{background:rgba(227,30,36,.15);color:var(--red2)}
+.av.blue{background:rgba(59,130,246,.15);color:var(--blue)}
+.av.green{background:rgba(16,185,129,.15);color:var(--green)}
+.av.purple{background:rgba(139,92,246,.15);color:var(--purple)}
+.av.amber{background:rgba(245,158,11,.15);color:var(--amber)}
+.av.muted{background:#f8f6f1;color:#6b6560}
+.filters{display:flex;align-items:center;gap:8px;padding:12px 16px;border-bottom:1px solid #e8e2d9;flex-wrap:wrap}
+.filters .fc{width:auto;padding:7px 10px;font-size:12px}
+.filter-spacer{flex:1}
+.ftag{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;background:#f8f6f1;border:1px solid #e8e2d9;border-radius:6px;font-size:12px;color:#6b6560;cursor:pointer;white-space:nowrap;text-decoration:none}
+.ftag:hover,.ftag.active{border-color:var(--red);color:var(--red2);background:var(--red-bg)}
+.form-row{display:grid;gap:14px}
+.form-row.c2{grid-template-columns:repeat(2,1fr)}
+.form-row.c3{grid-template-columns:repeat(3,1fr)}
+.form-row.c4{grid-template-columns:repeat(4,1fr)}
+.form-span2{grid-column:span 2}
+.form-span3{grid-column:1/-1}
+.fg{display:flex;flex-direction:column;gap:5px}
+.flabel{font-size:10.5px;font-weight:600;color:#6b6560;text-transform:uppercase;letter-spacing:.06em}
+.fc{background:#f8f6f1;border:1px solid #e8e2d9;border-radius:8px;padding:9px 12px;color:#1a1612;font-size:13px;outline:none;width:100%;transition:border-color .2s;font-family:inherit}
+.fc:focus{border-color:var(--red)}
+.fc::placeholder{color:#6b6560}
+select.fc option{background:#ffffff}
+textarea.fc{resize:vertical;min-height:88px}
+.fc-hint{font-size:11px;color:#6b6560;margin-top:3px}
+.upload-zone{border:2px dashed #e8e2d9;border-radius:8px;padding:28px 20px;text-align:center;cursor:pointer;transition:border-color .2s}
+.upload-zone:hover{border-color:var(--red)}
+.upload-zone i{font-size:30px;color:#6b6560;display:block;margin-bottom:8px}
+.upload-zone p{font-size:12px;color:#6b6560}
+.check-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.check-item{display:flex;align-items:center;gap:8px;font-size:12.5px;cursor:pointer}
+input[type=checkbox]{accent-color:var(--red);width:14px;height:14px;cursor:pointer;flex-shrink:0}
+.pagination{display:flex;align-items:center;gap:4px;padding:12px 16px;border-top:1px solid #e8e2d9}
+.pg-btn{width:30px;height:30px;border-radius:6px;border:1px solid #e8e2d9;background:#f8f6f1;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:12px;color:#6b6560;transition:all .15s;text-decoration:none}
+.pg-btn:hover{border-color:var(--red);color:#1a1612}
+.pg-btn.active{background:var(--red);border-color:var(--red);color:#fff}
+.pg-info{margin-left:auto;font-size:11px;color:#6b6560}
+.two-col{display:grid;grid-template-columns:2fr 1fr;gap:14px}
+.two-col-eq{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+.mb-14{margin-bottom:14px}
+.stat-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.05)}
+.stat-row:last-child{border-bottom:none}
+.stat-lbl{font-size:11px;color:#6b6560}
+.stat-val{font-size:13px;font-weight:600}
+.bar-row{display:flex;align-items:center;gap:10px;margin-bottom:9px}
+.bar-row:last-child{margin-bottom:0}
+.bar-lbl{width:85px;font-size:12px;font-weight:500;flex-shrink:0}
+.bar-track{flex:1;height:8px;background:rgba(255,255,255,.06);border-radius:4px;overflow:hidden}
+.bar-fill{height:100%;border-radius:4px}
+.bar-val{width:50px;text-align:right;font-size:11px;font-weight:600;flex-shrink:0}
+.divider{border:none;border-top:1px solid #e8e2d9;margin:14px 0}
+.text-muted{color:#6b6560}
+.text-green{color:var(--green)}
+.text-amber{color:var(--amber)}
+.text-red{color:var(--red2)}
+.text-blue{color:var(--blue)}
+.fw6{font-weight:600}
+.fw7{font-weight:700}
+.fs11{font-size:11px}
+.fs12{font-size:12px}
+.inv-input{background:#f8f6f1;border:1px solid #e8e2d9;border-radius:6px;padding:5px 8px;color:#1a1612;font-size:12px;outline:none;width:100%;min-width:90px;font-family:inherit;text-align:center}
+.inv-input:focus{border-color:var(--red)}
+.inv-status-sel{background:#f8f6f1;border:1px solid #e8e2d9;border-radius:6px;padding:5px 6px;color:#1a1612;font-size:11px;outline:none;width:100%;min-width:90px;font-family:inherit}
+.section-lbl{font-size:10px;font-weight:700;color:#6b6560;letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px;margin-top:4px}
+.tab-pills{display:flex;gap:2px;background:#f8f6f1;border-radius:8px;padding:3px;width:fit-content}
+.tab-pill{padding:6px 14px;border-radius:6px;font-size:12px;font-weight:500;cursor:pointer;color:#6b6560}
+.tab-pill.active,.tab-pill:hover{background:#ffffff;color:#1a1612}
+.tab-pane{display:none}
+.tab-pane.active{display:block}
+.pkg-card{background:#f8f6f1;border:1px solid #e8e2d9;border-radius:10px;padding:16px;position:relative}
+.pkg-card.featured{border-color:var(--red);background:rgba(227,30,36,.05)}
+.pkg-badge{position:absolute;top:-8px;right:16px;background:var(--red);color:#fff;font-size:10px;font-weight:700;padding:2px 10px;border-radius:10px}
+.pkg-price{font-size:28px;font-weight:700;letter-spacing:-.5px;line-height:1;margin:10px 0 4px}
+.pkg-term{font-size:11px;color:#6b6560}
+.pkg-feature{display:flex;align-items:center;gap:8px;font-size:12px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.05)}
+.pkg-feature:last-child{border-bottom:none}
+.pkg-feature i{color:var(--green);font-size:14px;flex-shrink:0}
+.switch{position:relative;width:36px;height:20px;flex-shrink:0}
+.switch input{opacity:0;width:0;height:0}
+.switch-track{position:absolute;inset:0;background:#f1ede5;border-radius:10px;transition:background .2s;cursor:pointer}
+.switch input:checked+.switch-track{background:var(--green)}
+.switch-thumb{position:absolute;top:2px;left:2px;width:16px;height:16px;background:#fff;border-radius:50%;transition:transform .2s;pointer-events:none}
+.switch input:checked~.switch-thumb{transform:translateX(16px)}
+.msg-bubble{background:#f8f6f1;border-radius:10px;padding:12px 14px;margin-bottom:10px}
+.msg-bubble.admin-reply{background:var(--red-bg);border:1px solid rgba(227,30,36,.2)}
+.msg-meta{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.msg-author{font-size:12px;font-weight:600}
+.msg-time{font-size:11px;color:#6b6560}
+.msg-text{font-size:13px;line-height:1.6}
+.gw-card{background:#f8f6f1;border:1px solid #e8e2d9;border-radius:10px;padding:14px;display:flex;align-items:center;gap:12px}
+.gw-logo{width:40px;height:40px;border-radius:8px;background:#ffffff;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.gw-name{font-size:13px;font-weight:600;flex:1}
+.gw-sub{font-size:11px;color:#6b6560;margin-top:2px}
+</style>
+<style>
+/* ── Critical layout override — beats atlantis.css position:fixed on .sidebar ── */
+html { height:100%!important; overflow:hidden!important; }
+body { display:flex!important; flex-direction:row!important; height:100%!important; overflow:hidden!important; margin:0!important; padding:0!important; }
+/* Override atlantis position:fixed on .sidebar */
+.sidebar { position:relative!important; left:auto!important; right:auto!important; top:auto!important; bottom:auto!important; transform:none!important; margin-top:0!important; display:flex!important; flex-direction:column!important; flex-shrink:0!important; width:var(--sidebar)!important; height:100vh!important; overflow:hidden!important; z-index:auto!important; box-shadow:none!important; }
+.sidebar.sz-collapsed { width:var(--sidebar-collapsed)!important; }
+/* Main content area */
+.main { position:relative!important; flex:1!important; display:flex!important; flex-direction:column!important; height:100vh!important; overflow:hidden!important; min-width:0!important; margin-left:0!important; }
+.sz-content { flex:1!important; overflow-y:auto!important; overflow-x:hidden!important; }
+.sz-topbar { flex-shrink:0!important; }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <div class="sb-logo">
+    @php $logo = optional($websiteInfo)->header_logo ?? null; @endphp
+    @if($logo)
+      <img src="{{ asset('assets/img/'.$logo) }}" alt="logo" style="height:28px;max-width:120px;object-fit:contain">
+    @else
+      <div class="sb-mark">S</div>
+    @endif
+    <div>
+      <div class="sb-name">{{ optional($websiteInfo)->website_title ?? 'StayZio' }}</div>
+      <div class="sb-role">
+        @if(is_null($roleInfo ?? null)) Super Admin @else {{ $roleInfo->name ?? 'Admin' }} @endif
+      </div>
+    </div>
+  </div>
+
+  <div class="sb-search">
+    <input type="text" placeholder="🔍  Search menu…" id="sz-search" oninput="szSearch(this.value)">
+  </div>
+
+  <nav class="sb-nav">
+    @php
+      $rp = (!isset($roleInfo) || is_null($roleInfo ?? null))
+            ? null
+            : json_decode($roleInfo->permissions ?? '[]');
+    @endphp
+
+    <div class="sb-group">Overview</div>
+    <a href="{{ route('admin.dashboard', ['language' => $defaultLang->code ?? 'en']) }}"
+       class="sb-item {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
+      <i class="ti ti-layout-dashboard icon"></i><span class="lbl">Dashboard</span>
+    </a>
+    @php $sidebarNotifCount = \App\Models\AdminNotification::unreadCount(); @endphp
+    <a href="{{ route('admin.notifications.index') }}"
+       class="sb-item {{ request()->routeIs('admin.notifications.*') ? 'active' : '' }}"
+       style="position:relative">
+      <i class="ti ti-bell icon"></i>
+      <span class="lbl">Notifications</span>
+      @if($sidebarNotifCount > 0)
+      <span style="margin-left:auto;background:var(--red);color:#fff;font-size:9px;font-weight:900;border-radius:999px;min-width:17px;height:17px;display:inline-flex;align-items:center;justify-content:center;padding:0 3px;flex-shrink:0">
+        {{ $sidebarNotifCount > 99 ? '99+' : $sidebarNotifCount }}
+      </span>
+      @endif
+    </a>
+    @if(is_null($rp) || in_array('Transaction', (array)$rp))
+    <a href="{{ route('admin.transcation', ['language' => $defaultLang->code ?? 'en']) }}"
+       class="sb-item {{ request()->routeIs('admin.transcation') ? 'active' : '' }}">
+      <i class="ti ti-arrows-exchange icon"></i><span class="lbl">Transactions</span>
+    </a>
+    @endif
+
+    <div class="sb-group">Property</div>
+    @if(is_null($rp) || in_array('Hotels Management', (array)$rp))
+    <div class="sb-item {{ request()->routeIs(['admin.hotel_management.*']) ? 'active open' : '' }}"
+         id="nav-hotels" onclick="szToggle('sub-hotels','nav-hotels')">
+      <i class="ti ti-building icon"></i><span class="lbl">Hotels</span><i class="ti ti-chevron-right arr"></i>
+    </div>
+    <div class="sb-sub {{ request()->routeIs(['admin.hotel_management.*']) ? 'open' : '' }}" id="sub-hotels">
+      <a class="sb-sub-item {{ request()->routeIs('admin.hotel_management.hotels') ? 'active' : '' }}"
+         href="{{ route('admin.hotel_management.hotels', ['language' => $defaultLang->code ?? 'en']) }}">All Hotels</a>
+      <a class="sb-sub-item {{ request()->routeIs('admin.hotel_management.select_vendor','admin.hotel_management.create_hotel') ? 'active' : '' }}"
+         href="{{ route('admin.hotel_management.select_vendor', ['language' => $defaultLang->code ?? 'en']) }}">Add Hotel</a>
+      <a class="sb-sub-item {{ request()->routeIs('admin.hotel_management.hourly_inventory*') ? 'active' : '' }}"
+         href="{{ url('admin/hotel-management/hourly-inventory') }}">Hourly Inventory</a>
+      <a class="sb-sub-item {{ request()->routeIs('admin.hotel_management.master_data*') ? 'active' : '' }}"
+         href="{{ route('admin.hotel_management.master_data.index') }}">Master Data</a>
+      @if(Route::has('admin.property_submissions.index'))
+      <a class="sb-sub-item {{ request()->routeIs('admin.property_submissions*') ? 'active' : '' }}"
+         href="{{ route('admin.property_submissions.index') }}">Property Submissions
+         @php $pendingProps = \App\Models\VendorProperty::pending()->count(); @endphp
+         @if($pendingProps > 0)<span class="sb-count" style="background:var(--red);color:#fff;padding:1px 6px;border-radius:10px;font-size:9px;margin-left:4px">{{ $pendingProps }}</span>@endif
+      </a>
+      @endif
+      <a class="sb-sub-item {{ request()->routeIs('admin.hotel_management.featured_hotel.*') ? 'active' : '' }}"
+         href="{{ route('admin.hotel_management.featured_hotel.all_request', ['language' => $defaultLang->code ?? 'en']) }}">Featured Hotels</a>
+      <a class="sb-sub-item {{ request()->routeIs('admin.hotel_management.hotel.holiday') ? 'active' : '' }}"
+         href="{{ route('admin.hotel_management.hotel.holiday', ['language' => $defaultLang->code ?? 'en', 'vendor_id' => 'admin']) }}">Holidays & Blackouts</a>
+      <a class="sb-sub-item {{ request()->routeIs('admin.hotel_management.categories') ? 'active' : '' }}"
+         href="{{ route('admin.hotel_management.categories', ['language' => $defaultLang->code ?? 'en']) }}">Categories</a>
+      <a class="sb-sub-item {{ request()->routeIs('admin.hotel_management.amenities') ? 'active' : '' }}"
+         href="{{ route('admin.hotel_management.amenities', ['language' => $defaultLang->code ?? 'en']) }}">Amenities</a>
+      <a class="sb-sub-item {{ request()->routeIs('admin.hotel_management.location.*') ? 'active' : '' }}"
+         href="{{ route('admin.hotel_management.location.countries', ['language' => $defaultLang->code ?? 'en']) }}">Locations</a>
+    </div>
+    @endif
+
+    @if(is_null($rp) || in_array('Rooms Management', (array)$rp))
+    <div class="sb-item {{ request()->routeIs(['admin.room_management.*']) ? 'active open' : '' }}"
+         id="nav-rooms" onclick="szToggle('sub-rooms','nav-rooms')">
+      <i class="ti ti-bed icon"></i><span class="lbl">Rooms</span><i class="ti ti-chevron-right arr"></i>
+    </div>
+    <div class="sb-sub {{ request()->routeIs(['admin.room_management.*']) ? 'open' : '' }}" id="sub-rooms">
+      <a class="sb-sub-item {{ request()->routeIs('admin.room_management.rooms') ? 'active' : '' }}"
+         href="{{ route('admin.room_management.rooms', ['language' => $defaultLang->code ?? 'en']) }}">All Rooms</a>
+      <a class="sb-sub-item {{ request()->routeIs('admin.room_management.select_vendor','admin.room_management.create_room') ? 'active' : '' }}"
+         href="{{ route('admin.room_management.select_vendor') }}">Add Room</a>
+      <a class="sb-sub-item {{ request()->routeIs('admin.room_management.categories') ? 'active' : '' }}"
+         href="{{ route('admin.room_management.categories', ['language' => $defaultLang->code ?? 'en']) }}">Categories</a>
+      <a class="sb-sub-item {{ request()->routeIs('admin.room_management.additional_services') ? 'active' : '' }}"
+         href="{{ route('admin.room_management.additional_services', ['language' => $defaultLang->code ?? 'en']) }}">Additional Services</a>
+      <a class="sb-sub-item {{ request()->routeIs('admin.room_management.featured_room.*') ? 'active' : '' }}"
+         href="{{ route('admin.room_management.featured_room.all_request', ['language' => $defaultLang->code ?? 'en']) }}">Featured Rooms</a>
+    </div>
+    @endif
+
+    <div class="sb-group">Bookings</div>
+    @if(is_null($rp) || in_array('Room Bookings', (array)$rp))
+    <div class="sb-item {{ request()->routeIs(['admin.room_bookings.*']) ? 'active open' : '' }}"
+         id="nav-bookings" onclick="szToggle('sub-bookings','nav-bookings')">
+      <i class="ti ti-calendar-check icon"></i><span class="lbl">All Bookings</span><i class="ti ti-chevron-right arr"></i>
+    </div>
+    <div class="sb-sub {{ request()->routeIs(['admin.room_bookings.*']) ? 'open' : '' }}" id="sub-bookings">
+      <a class="sb-sub-item {{ request()->routeIs('admin.room_bookings.all_bookings') ? 'active' : '' }}"
+         href="{{ route('admin.room_bookings.all_bookings', ['language' => $defaultLang->code ?? 'en']) }}">All Bookings</a>
+      <a class="sb-sub-item {{ request()->routeIs('admin.room_bookings.paid_bookings') ? 'active' : '' }}"
+         href="{{ route('admin.room_bookings.paid_bookings', ['language' => $defaultLang->code ?? 'en']) }}">Paid Bookings</a>
+      <a class="sb-sub-item {{ request()->routeIs('admin.room_bookings.unpaid_bookings') ? 'active' : '' }}"
+         href="{{ route('admin.room_bookings.unpaid_bookings', ['language' => $defaultLang->code ?? 'en']) }}">Unpaid Bookings</a>
+      <a class="sb-sub-item {{ request()->routeIs('admin.room_bookings.report') ? 'active' : '' }}"
+         href="{{ route('admin.room_bookings.report') }}">Booking Report</a>
+      <a class="sb-sub-item {{ request()->routeIs('admin.room_bookings.booking_form') ? 'active' : '' }}"
+         href="{{ route('admin.room_bookings.booking_form', ['language' => $defaultLang->code ?? 'en']) }}">New Booking</a>
+    </div>
+    @endif
+    <a class="sb-item {{ request()->routeIs('admin.room_management.booking_hours') ? 'active' : '' }}"
+       href="{{ route('admin.room_management.booking_hours', ['language' => $defaultLang->code ?? 'en']) }}">
+      <i class="ti ti-clock-dollar icon"></i><span class="lbl">Pricing Setup</span>
+    </a>
+    <a class="sb-item {{ request()->routeIs('admin.room_management.coupons') ? 'active' : '' }}"
+       href="{{ route('admin.room_management.coupons', ['language' => $defaultLang->code ?? 'en']) }}">
+      <i class="ti ti-ticket icon"></i><span class="lbl">Coupons</span>
+    </a>
+
+    <div class="sb-group">People</div>
+    @if(is_null($rp) || in_array('Vendors Management', (array)$rp))
+    <div class="sb-item {{ request()->routeIs(['admin.vendor_management.*','admin.edit_management.*']) ? 'active open' : '' }}"
+         id="nav-vendors" onclick="szToggle('sub-vendors','nav-vendors')">
+      <i class="ti ti-building-store icon"></i><span class="lbl">Vendors</span><i class="ti ti-chevron-right arr"></i>
+    </div>
+    <div class="sb-sub {{ request()->routeIs(['admin.vendor_management.*','admin.edit_management.*']) ? 'open' : '' }}" id="sub-vendors">
+      <a class="sb-sub-item {{ request()->routeIs('admin.vendor_management.registered_vendor') ? 'active' : '' }}"
+         href="{{ route('admin.vendor_management.registered_vendor', ['language' => $defaultLang->code ?? 'en']) }}">All Vendors</a>
+      <a class="sb-sub-item {{ request()->routeIs('admin.vendor_management.add_vendor') ? 'active' : '' }}"
+         href="{{ route('admin.vendor_management.add_vendor', ['language' => $defaultLang->code ?? 'en']) }}">Add Vendor</a>
+    </div>
+    @endif
+
+    @if(is_null($rp) || in_array('User Management', (array)$rp))
+    <div class="sb-item {{ request()->routeIs(['admin.user_management.*']) ? 'active open' : '' }}"
+         id="nav-customers" onclick="szToggle('sub-customers','nav-customers')">
+      <i class="ti ti-users icon"></i><span class="lbl">Customers</span><i class="ti ti-chevron-right arr"></i>
+    </div>
+    <div class="sb-sub {{ request()->routeIs(['admin.user_management.*']) ? 'open' : '' }}" id="sub-customers">
+      <a class="sb-sub-item {{ request()->routeIs('admin.user_management.registered_users') ? 'active' : '' }}"
+         href="{{ route('admin.user_management.registered_users', ['language' => $defaultLang->code ?? 'en']) }}">All Customers</a>
+      <a class="sb-sub-item {{ request()->routeIs('admin.user_management.registered_user.create') ? 'active' : '' }}"
+         href="{{ route('admin.user_management.registered_user.create', ['language' => $defaultLang->code ?? 'en']) }}">Add Customer</a>
+      <a class="sb-sub-item {{ request()->routeIs('admin.user_management.push_notification.*') ? 'active' : '' }}"
+         href="{{ route('admin.user_management.push_notification.notification_for_visitors', ['language' => $defaultLang->code ?? 'en']) }}">Push Notifications</a>
+    </div>
+    @endif
+
+    <div class="sb-group">Finance</div>
+    @if(is_null($rp) || in_array('Withdrawals Management', (array)$rp))
+    <div class="sb-item {{ request()->routeIs(['admin.withdraw.*','admin.withdraw_payment_method.*']) ? 'active open' : '' }}"
+         id="nav-wd" onclick="szToggle('sub-wd','nav-wd')">
+      <i class="ti ti-credit-card icon"></i><span class="lbl">Withdrawals</span><i class="ti ti-chevron-right arr"></i>
+    </div>
+    <div class="sb-sub {{ request()->routeIs(['admin.withdraw.*','admin.withdraw_payment_method.*']) ? 'open' : '' }}" id="sub-wd">
+      <a class="sb-sub-item {{ request()->routeIs('admin.withdraw.withdraw_request') ? 'active' : '' }}"
+         href="{{ route('admin.withdraw.withdraw_request', ['language' => $defaultLang->code ?? 'en']) }}">All Requests</a>
+      <a class="sb-sub-item {{ request()->routeIs('admin.withdraw.payment_method') ? 'active' : '' }}"
+         href="{{ route('admin.withdraw.payment_method', ['language' => $defaultLang->code ?? 'en']) }}">Payout Methods</a>
+    </div>
+    @endif
+    @if(is_null($rp) || in_array('Payment Log', (array)$rp))
+    <a class="sb-item {{ request()->routeIs('admin.subscription-log') ? 'active' : '' }}"
+       href="{{ route('admin.subscription-log', ['language' => $defaultLang->code ?? 'en']) }}">
+      <i class="ti ti-receipt icon"></i><span class="lbl">Subscriptions</span>
+    </a>
+    @endif
+    @if(is_null($rp) || in_array('Packages Management', (array)$rp))
+    <div class="sb-item {{ request()->routeIs(['admin.package.*']) ? 'active open' : '' }}"
+         id="nav-pkg" onclick="szToggle('sub-pkg','nav-pkg')">
+      <i class="ti ti-package icon"></i><span class="lbl">Packages</span><i class="ti ti-chevron-right arr"></i>
+    </div>
+    <div class="sb-sub {{ request()->routeIs(['admin.package.*']) ? 'open' : '' }}" id="sub-pkg">
+      <a class="sb-sub-item {{ request()->routeIs('admin.package.index','admin.package.edit') ? 'active' : '' }}"
+         href="{{ route('admin.package.index', ['language' => $defaultLang->code ?? 'en']) }}">All Packages</a>
+      <a class="sb-sub-item {{ request()->routeIs('admin.package.settings') ? 'active' : '' }}"
+         href="{{ route('admin.package.settings', ['language' => $defaultLang->code ?? 'en']) }}">Package Settings</a>
+    </div>
+    @endif
+    <a class="sb-item {{ request()->routeIs('admin.room_management.tax_amount') ? 'active' : '' }}"
+       href="{{ route('admin.room_management.tax_amount', ['language' => $defaultLang->code ?? 'en']) }}">
+      <i class="ti ti-percentage icon"></i><span class="lbl">Commission Config</span>
+    </a>
+
+    <div class="sb-group">Support</div>
+    @if(is_null($rp) || in_array('Support Tickets', (array)$rp))
+    <div class="sb-item {{ request()->routeIs(['admin.support_tickets','admin.support_tickets.message','admin.support_ticket.setting']) ? 'active open' : '' }}"
+         id="nav-tickets" onclick="szToggle('sub-tickets','nav-tickets')">
+      <i class="ti ti-message-circle icon"></i><span class="lbl">Support Tickets</span><i class="ti ti-chevron-right arr"></i>
+    </div>
+    <div class="sb-sub {{ request()->routeIs(['admin.support_tickets','admin.support_tickets.message','admin.support_ticket.setting']) ? 'open' : '' }}" id="sub-tickets">
+      <a class="sb-sub-item {{ request()->routeIs('admin.support_tickets') && !request('status') ? 'active' : '' }}"
+         href="{{ route('admin.support_tickets') }}">All Tickets</a>
+      <a class="sb-sub-item {{ request()->routeIs('admin.support_tickets') && request('status')==2 ? 'active' : '' }}"
+         href="{{ route('admin.support_tickets', ['status' => 2]) }}">Open Tickets</a>
+      <a class="sb-sub-item {{ request()->routeIs('admin.support_tickets') && request('status')==3 ? 'active' : '' }}"
+         href="{{ route('admin.support_tickets', ['status' => 3]) }}">Closed Tickets</a>
+      <a class="sb-sub-item {{ request()->routeIs('admin.support_ticket.setting') ? 'active' : '' }}"
+         href="{{ route('admin.support_ticket.setting') }}">Settings</a>
+    </div>
+    @endif
+
+    <div class="sb-group">Content & Settings</div>
+    @if(is_null($rp) || in_array('Pages', (array)$rp))
+    <div class="sb-item {{ request()->routeIs(['admin.pages.*','admin.additional*','admin.settings.seo']) ? 'active open' : '' }}"
+         id="nav-cms" onclick="szToggle('sub-cms','nav-cms')">
+      <i class="ti ti-file-text icon"></i><span class="lbl">CMS / Pages</span><i class="ti ti-chevron-right arr"></i>
+    </div>
+    <div class="sb-sub {{ request()->routeIs(['admin.pages.*','admin.additional*','admin.settings.seo']) ? 'open' : '' }}" id="sub-cms">
+      <a class="sb-sub-item" href="{{ route('admin.pages.home_page.section_content', ['language' => $defaultLang->code ?? 'en']) }}">Home Page</a>
+      <a class="sb-sub-item {{ request()->routeIs('admin.pages.about_us.index') ? 'active' : '' }}"
+         href="{{ route('admin.pages.about_us.index', ['language' => $defaultLang->code ?? 'en']) }}">About Us</a>
+      <a class="sb-sub-item {{ request()->routeIs('admin.pages.blog.*') ? 'active' : '' }}"
+         href="{{ route('admin.pages.blog.blogs', ['language' => $defaultLang->code ?? 'en']) }}">Blog & Posts</a>
+      <a class="sb-sub-item {{ request()->routeIs('admin.pages.faq_management') ? 'active' : '' }}"
+         href="{{ route('admin.pages.faq_management', ['language' => $defaultLang->code ?? 'en']) }}">FAQs</a>
+      <a class="sb-sub-item {{ request()->routeIs('admin.pages.additional_pages') ? 'active' : '' }}"
+         href="{{ route('admin.pages.additional_pages', ['language' => $defaultLang->code ?? 'en']) }}">Custom Pages</a>
+      <a class="sb-sub-item {{ request()->routeIs('admin.pages.footer.*') ? 'active' : '' }}"
+         href="{{ route('admin.pages.footer.logo_and_image') }}">Footer</a>
+      <a class="sb-sub-item {{ request()->routeIs('admin.settings.seo') ? 'active' : '' }}"
+         href="{{ route('admin.settings.seo', ['language' => $defaultLang->code ?? 'en']) }}">SEO Settings</a>
+    </div>
+    @endif
+
+    @if(is_null($rp) || in_array('Settings', (array)$rp))
+    <div class="sb-item {{ request()->routeIs(['admin.settings.*']) ? 'active open' : '' }}"
+         id="nav-settings" onclick="szToggle('sub-settings','nav-settings')">
+      <i class="ti ti-settings icon"></i><span class="lbl">Settings</span><i class="ti ti-chevron-right arr"></i>
+    </div>
+    <div class="sb-sub {{ request()->routeIs(['admin.settings.*']) ? 'open' : '' }}" id="sub-settings">
+      <a class="sb-sub-item {{ request()->routeIs('admin.settings.general_settings') ? 'active' : '' }}"
+         href="{{ route('admin.settings.general_settings') }}">General</a>
+      <a class="sb-sub-item {{ request()->routeIs('admin.settings.payment_gateways.*') ? 'active' : '' }}"
+         href="{{ route('admin.settings.payment_gateways.online_gateways') }}">Payment Gateways</a>
+      <a class="sb-sub-item {{ request()->routeIs('admin.settings.mail_from_admin','admin.settings.mail_to_admin','admin.settings.mail_templates') ? 'active' : '' }}"
+         href="{{ route('admin.settings.mail_from_admin') }}">Email Settings</a>
+      <a class="sb-sub-item {{ request()->routeIs('admin.settings.language_management') ? 'active' : '' }}"
+         href="{{ route('admin.settings.language_management') }}">Languages</a>
+      <a class="sb-sub-item {{ request()->routeIs('admin.settings.social_medias') ? 'active' : '' }}"
+         href="{{ route('admin.settings.social_medias') }}">Social Media</a>
+      <a class="sb-sub-item {{ request()->routeIs('admin.settings.maintenance_mode') ? 'active' : '' }}"
+         href="{{ route('admin.settings.maintenance_mode') }}">Maintenance</a>
+    </div>
+    @endif
+
+    @if(is_null($rp) || in_array('Staffs Management', (array)$rp))
+    <div class="sb-item {{ request()->routeIs(['admin.admin_management.*']) ? 'active open' : '' }}"
+         id="nav-staff" onclick="szToggle('sub-staff','nav-staff')">
+      <i class="ti ti-users-group icon"></i><span class="lbl">Staff & Roles</span><i class="ti ti-chevron-right arr"></i>
+    </div>
+    <div class="sb-sub {{ request()->routeIs(['admin.admin_management.*']) ? 'open' : '' }}" id="sub-staff">
+      <a class="sb-sub-item {{ request()->routeIs('admin.admin_management.registered_admins') ? 'active' : '' }}"
+         href="{{ route('admin.admin_management.registered_admins') }}">Registered Admins</a>
+      <a class="sb-sub-item {{ request()->routeIs('admin.admin_management.role_permissions','admin.admin_management.role.permissions') ? 'active' : '' }}"
+         href="{{ route('admin.admin_management.role_permissions') }}">Roles & Permissions</a>
+    </div>
+    @endif
+
+  </nav>
+</div>
+<!-- END SIDEBAR -->
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <button class="sz-hamburger" id="sz-toggle" title="Toggle sidebar"><i class="ti ti-menu-2"></i></button>
+    <div class="tb-bc">
+      <span>@yield('section','Admin')</span>
+      @hasSection('page')
+        <i class="ti ti-chevron-right" style="font-size:10px"></i>
+        <span class="cur">@yield('page')</span>
+      @endif
+    </div>
+    <div class="tb-spacer"></div>
+    <div class="tb-btn tb-notif" title="Notifications" id="notifBell" onclick="toggleNotifDropdown()" style="position:relative">
+      <i class="ti ti-bell"></i>
+      @php $notifCount = \App\Models\AdminNotification::unreadCount(); @endphp
+      @if($notifCount > 0)
+      <div class="dot" id="notifDot"></div>
+      <span id="notifBadge" style="position:absolute;top:4px;right:4px;background:var(--red);color:#fff;font-size:9px;font-weight:900;border-radius:999px;min-width:16px;height:16px;display:flex;align-items:center;justify-content:center;padding:0 3px;pointer-events:none">
+        {{ $notifCount > 99 ? '99+' : $notifCount }}
+      </span>
+      @endif
+    </div>
+
+    {{-- Notification Dropdown --}}
+    <div id="notifDropdown" style="display:none;position:fixed;top:64px;right:14px;width:380px;background:#ffffff;border:1px solid #e8e2d9;border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,.25);z-index:1000;overflow:hidden">
+      <div style="padding:14px 16px;border-bottom:1px solid #e8e2d9;display:flex;align-items:center;justify-content:space-between">
+        <div style="font-size:14px;font-weight:800;color:#1a1612">Notifications</div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <button onclick="markAllRead()" style="font-size:11px;font-weight:700;color:#6b6560;background:none;border:none;cursor:pointer;padding:0">Mark all read</button>
+          <a href="{{ route('admin.notifications.index') }}" style="font-size:11px;font-weight:700;color:var(--red);text-decoration:none">View all</a>
+        </div>
+      </div>
+      <div id="notifList" style="max-height:400px;overflow-y:auto">
+        <div style="padding:20px;text-align:center;color:#6b6560;font-size:12px" id="notifLoading">
+          <i class="ti ti-loader" style="animation:spin 1s linear infinite"></i> Loading...
+        </div>
+      </div>
+    </div>
+    <div class="tb-btn" title="Visit Site" onclick="window.open('{{ url('/') }}','_blank')">
+      <i class="ti ti-external-link"></i>
+    </div>
+    <a href="{{ route('admin.edit_profile') }}" class="tb-btn" title="Profile">
+      <i class="ti ti-user"></i>
+    </a>
+    <a href="{{ route('admin.logout') }}" class="tb-btn" title="Logout">
+      <i class="ti ti-logout"></i>
+    </a>
+    <div class="tb-avatar">
+      {{ strtoupper(substr(optional(Auth::guard('admin')->user())->first_name ?? 'A', 0, 1)) }}
+    </div>
+    <span class="tb-uname">
+      {{ optional(Auth::guard('admin')->user())->first_name ?? 'Admin' }}
+    </span>
+  </div>
+
+  <div class="content">
+    @if(session('success'))
+    <div style="background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.3);color:var(--green);border-radius:8px;padding:10px 14px;margin-bottom:14px;display:flex;align-items:center;gap:8px;font-size:13px">
+      <i class="ti ti-circle-check"></i> {{ session('success') }}
+    </div>
+    @endif
+    @if(session('error'))
+    <div style="background:rgba(227,30,36,.1);border:1px solid rgba(227,30,36,.2);color:#f87171;border-radius:8px;padding:10px 14px;margin-bottom:14px;display:flex;align-items:center;gap:8px;font-size:13px">
+      <i class="ti ti-alert-circle"></i> {{ session('error') }}
+    </div>
+    @endif
+    @yield('content')
+  </div>
+</div>
+
+<script>
+function szToggle(subId, navId) {
+  var sub = document.getElementById(subId);
+  var nav = document.getElementById(navId);
+  var isOpen = sub.classList.contains('open');
+  document.querySelectorAll('.sb-sub.open').forEach(function(s){ if(s.id !== subId) s.classList.remove('open'); });
+  document.querySelectorAll('.sb-item.open').forEach(function(e){ if(e.id !== navId) e.classList.remove('open'); });
+  sub.classList.toggle('open', !isOpen);
+  if(nav) nav.classList.toggle('open', !isOpen);
+}
+function szSearch(q) {
+  q = q.toLowerCase();
+  document.querySelectorAll('.sb-sub').forEach(function(s){ s.classList.toggle('open', !!q); });
+  document.querySelectorAll('.sb-item, .sb-sub-item, .sb-group').forEach(function(el){
+    el.style.display = (!q || el.textContent.toLowerCase().includes(q)) ? '' : 'none';
+  });
+}
+// Sidebar toggle — EXPANDED by default, hamburger collapses
+(function(){
+  var sb = document.querySelector('.sidebar');
+  var btn = document.getElementById('sz-toggle');
+  var KEY = 'sz_admin_sb';
+  var open = localStorage.getItem(KEY) !== 'collapsed';
+  if (!open) sb.classList.add('sz-collapsed');
+  if (btn) btn.addEventListener('click', function(){
+    open = !open;
+    localStorage.setItem(KEY, open ? 'open' : 'collapsed');
+    sb.classList.toggle('sz-collapsed', !open);
+  });
+})();
+</script>
+@include('admin.partials.scripts')
+@yield('script')
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  document.body.style.cssText = 'display:flex!important;margin:0!important;padding:0!important;overflow:hidden!important';
+});
+</script>
+
+<style>
+@keyframes spin{to{transform:rotate(360deg)}}
+.notif-item{display:flex;align-items:flex-start;gap:10px;padding:12px 16px;border-bottom:1px solid #e8e2d9;text-decoration:none;transition:.15s;cursor:pointer}
+.notif-item:hover{background:#f8f6f1}
+.notif-item.unread{background:rgba(227,30,36,.04)}
+.notif-item-icon{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.notif-item-body{flex:1;min-width:0}
+.notif-item-title{font-size:12px;font-weight:700;color:#1a1612;margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.notif-item-msg{font-size:11px;color:#6b6560;line-height:1.4;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.notif-item-time{font-size:10px;color:#6b6560;margin-top:3px}
+.notif-unread-dot{width:6px;height:6px;background:var(--red);border-radius:50%;flex-shrink:0;margin-top:5px}
+</style>
+<script>
+var notifOpen = false;
+function toggleNotifDropdown() {
+  notifOpen = !notifOpen;
+  var d = document.getElementById('notifDropdown');
+  d.style.display = notifOpen ? 'block' : 'none';
+  if (notifOpen) loadNotifications();
+}
+document.addEventListener('click', function(e) {
+  if (notifOpen && !document.getElementById('notifBell').contains(e.target) && !document.getElementById('notifDropdown').contains(e.target)) {
+    notifOpen = false;
+    document.getElementById('notifDropdown').style.display = 'none';
+  }
+});
+function loadNotifications() {
+  fetch('{{ route("admin.notifications.dropdown") }}')
+    .then(r => r.json())
+    .then(data => {
+      var list = document.getElementById('notifList');
+      var colors = {
+        blue:   {bg:'#eff6ff',border:'#bfdbfe',text:'#1d4ed8'},
+        green:  {bg:'#f0fdf4',border:'#bbf7d0',text:'#15803d'},
+        red:    {bg:'#fff1f1',border:'#fecaca',text:'#dc2626'},
+        amber:  {bg:'#fffbeb',border:'#fde68a',text:'#d97706'},
+        purple: {bg:'#faf5ff',border:'#e9d5ff',text:'#7c3aed'},
+      };
+      if (data.items.length === 0) {
+        list.innerHTML = '<div style="padding:30px;text-align:center;color:#6b6560;font-size:12px"><i class="ti ti-bell-off" style="font-size:28px;display:block;margin-bottom:8px;opacity:.4"></i>No notifications</div>';
+        return;
+      }
+      var html = '';
+      data.items.forEach(function(n) {
+        var c = colors[n.color] || colors.blue;
+        var url = '{{ route("admin.notifications.read", ":id") }}'.replace(':id', n.id);
+        html += '<a href="' + url + '" class="notif-item' + (!n.is_read ? ' unread' : '') + '">';
+        html += '<div class="notif-item-icon" style="background:' + c.bg + ';border:1px solid ' + c.border + '">';
+        html += '<i class="ti ' + n.icon + '" style="color:' + c.text + '"></i></div>';
+        html += '<div class="notif-item-body">';
+        html += '<div class="notif-item-title">' + n.title + '</div>';
+        html += '<div class="notif-item-msg">' + n.message + '</div>';
+        html += '<div class="notif-item-time">' + timeAgo(n.created_at) + '</div>';
+        html += '</div>';
+        if (!n.is_read) html += '<div class="notif-unread-dot"></div>';
+        html += '</a>';
+      });
+      list.innerHTML = html;
+      // Update badge
+      var badge = document.getElementById('notifBadge');
+      var dot = document.getElementById('notifDot');
+      if (badge) badge.textContent = data.unread > 0 ? (data.unread > 99 ? '99+' : data.unread) : '';
+      if (badge && data.unread === 0) badge.style.display = 'none';
+      if (dot && data.unread === 0) dot.style.display = 'none';
+    });
+}
+function markAllRead() {
+  fetch('{{ route("admin.notifications.mark_all_read") }}', {
+    method:'POST',
+    headers:{'X-CSRF-TOKEN':'{{ csrf_token() }}','Content-Type':'application/json'}
+  }).then(() => {
+    var badge = document.getElementById('notifBadge');
+    var dot = document.getElementById('notifDot');
+    if (badge) badge.style.display = 'none';
+    if (dot) dot.style.display = 'none';
+    loadNotifications();
+  });
+}
+function timeAgo(ts) {
+  var d = new Date(ts.replace(' ', 'T'));
+  var diff = Math.floor((Date.now() - d) / 1000);
+  if (diff < 60) return diff + 's ago';
+  if (diff < 3600) return Math.floor(diff/60) + 'm ago';
+  if (diff < 86400) return Math.floor(diff/3600) + 'h ago';
+  return Math.floor(diff/86400) + 'd ago';
+}
+// Auto-refresh unread count every 60s
+setInterval(function() {
+  fetch('{{ route("admin.notifications.dropdown") }}')
+    .then(r => r.json())
+    .then(data => {
+      var badge = document.getElementById('notifBadge');
+      var dot = document.getElementById('notifDot');
+      if (badge) {
+        badge.textContent = data.unread > 0 ? (data.unread > 99 ? '99+' : data.unread) : '';
+        badge.style.display = data.unread > 0 ? 'flex' : 'none';
+      }
+      if (dot) dot.style.display = data.unread > 0 ? 'block' : 'none';
+    });
+}, 60000);
+</script>
+</body>
+</html>

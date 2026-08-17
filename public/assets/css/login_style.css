@@ -1,0 +1,326 @@
+.login-hero {
+    background: linear-gradient(135deg, #e31e24 0%, #e31e24 60%, #e31e24 100%);
+    padding: 60px 20px;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+}
+
+/* CONTAINER */
+.hero-container {
+    max-width: 1200px;
+    margin: auto;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 40px;
+}
+
+/* LEFT */
+.herologin-left {
+    flex: 1;
+}
+
+.herologin-left h1 {
+    font-size: 56px;
+    color: #fff;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.herologin-left p {
+    margin-top: 20px;
+    font-size: 22px;
+    color: #fff;
+}
+
+/* RIGHT CARD */
+.login-card {
+    flex: 1;
+    max-width: 420px;
+    /* ✅ instead of 700px */
+    width: 100%;
+    background: #fff;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+}
+
+/* INPUT + TEXT */
+.login-card h2 {
+    margin-bottom: 10px;
+}
+
+.login-card .sub {
+    font-size: 14px;
+    color: #777;
+    margin-bottom: 20px;
+}
+
+.login-card label {
+    font-size: 14px;
+    display: block;
+    margin-bottom: 8px;
+}
+
+.login-card input {
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    margin-bottom: 20px;
+}
+
+/* BUTTONS */
+.btn {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.btn {
+    background: #e31e24;
+}
+
+
+
+/* Tab styling */
+.swiftbtn {
+    display: flex;
+    border: 2px solid #e31e24;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 20px;
+    gap: 0;
+    /* remove old gap */
+}
+
+.swiftbtn h6 {
+    flex: 1;
+    margin: 0;
+    padding: 10px 0;
+    text-align: center;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+    font-weight: 600;
+}
+
+.swiftbtn h6.active {
+    background: #e31e24;
+    color: #fff;
+}
+
+.swiftbtn h6:not(.active) {
+    background: #fff;
+    color: #e31e24;
+}
+
+/* Show/hide fields */
+.field-group {
+    display: none;
+}
+
+.field-group.show {
+    display: block;
+}
+
+/*----- card wrapper -----*/
+.card-wrapper {
+    flex: 1;
+    max-width: 420px;
+    width: 100%;
+    position: relative;
+}
+
+.card-wrapper .login-card {
+    max-width: 100%;
+    width: 100%;
+}
+
+/*  TABLET */
+@media (max-width: 992px) {
+    .herologin-left h1 {
+        font-size: 40px;
+    }
+
+    .herologin-left p {
+        font-size: 18px;
+    }
+}
+
+/*  MOBILE */
+@media (max-width: 768px) {
+
+    .hero-container {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .herologin-left h1 {
+        font-size: 30px;
+    }
+
+    .herologin-left p {
+        font-size: 16px;
+    }
+
+    .login-card {
+        max-width: 100%;
+        padding: 25px;
+    }
+}
+
+/* ===== StayZio common footer - updated responsive version ===== */
+.stayzio-footer,
+footer.stayzio-footer{
+    background:#f7f3ef !important;
+    color:#6f6258 !important;
+    border-top:1px solid #e8dfd7;
+    padding:64px 0 22px !important;
+    margin-top:40px;
+}
+.stayzio-footer-inner{
+    width:min(1180px, calc(100% - 48px));
+    margin:0 auto;
+    display:grid;
+    grid-template-columns:1.45fr 1fr 1fr 1fr;
+    gap:72px;
+    align-items:start;
+}
+.stayzio-footer-logo{
+    display:inline-flex;
+    align-items:center;
+    gap:10px;
+    color:#191514 !important;
+    text-decoration:none !important;
+    font-family:Georgia, 'Times New Roman', serif;
+    font-size:20px;
+    font-weight:800;
+    margin-bottom:16px;
+}
+.stayzio-footer-logo img{
+    width:56px;
+    height:52px;
+    object-fit:contain;
+    border-radius:8px;
+}
+.stayzio-footer-logo span span{color:#ef2b2d;}
+.stayzio-footer-brand p{
+    max-width:260px;
+    margin:0 0 22px;
+    color:#6f6258;
+    font-size:15px;
+    line-height:1.75;
+}
+.stayzio-socials{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+}
+.stayzio-socials a{
+    width:34px;
+    height:34px;
+    border:1px solid #e2d9d2;
+    background:#fffdfb;
+    border-radius:4px;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    color:#1d1714 !important;
+    text-decoration:none !important;
+    font-size:11px;
+    font-weight:800;
+    text-transform:lowercase;
+    transition:.2s ease;
+}
+.stayzio-socials a:hover{
+    background:#ef2b2d;
+    border-color:#ef2b2d;
+    color:#fff !important;
+    transform:translateY(-2px);
+}
+.stayzio-footer-col h5{
+    color:#17120f;
+    font-size:12px;
+    line-height:1;
+    font-weight:900;
+    text-transform:uppercase;
+    letter-spacing:4px;
+    margin:5px 0 22px;
+}
+.stayzio-footer-col a{
+    display:block;
+    color:#6f6258 !important;
+    text-decoration:none !important;
+    font-size:15px;
+    line-height:1.65;
+    margin-bottom:8px;
+    transition:.2s ease;
+}
+.stayzio-footer-col a:hover{
+    color:#ef2b2d !important;
+    padding-left:4px;
+}
+@media(max-width:900px){
+    .stayzio-footer,
+    footer.stayzio-footer{
+        padding:40px 0 26px !important;
+        margin-top:32px;
+    }
+    .stayzio-footer-inner{
+        width:min(100% - 32px, 720px);
+        grid-template-columns:1fr 1fr;
+        gap:32px 28px;
+    }
+    .stayzio-footer-brand{
+        grid-column:1/-1;
+        padding-bottom:8px;
+        border-bottom:1px solid #e8dfd7;
+    }
+    .stayzio-footer-brand p{max-width:100%;}
+}
+@media(max-width:560px){
+    .stayzio-footer,
+    footer.stayzio-footer{
+        padding:34px 0 24px !important;
+        margin-top:24px;
+    }
+    .stayzio-footer-inner{
+        width:calc(100% - 28px);
+        grid-template-columns:1fr;
+        gap:22px;
+    }
+    .stayzio-footer-logo{
+        font-size:19px;
+        margin-bottom:12px;
+    }
+    .stayzio-footer-logo img{
+        width:50px;
+        height:46px;
+    }
+    .stayzio-footer-brand p{
+        font-size:14px;
+        line-height:1.65;
+        margin-bottom:18px;
+    }
+    .stayzio-footer-col{
+        padding:18px 0 0;
+        border-top:1px solid #e8dfd7;
+    }
+    .stayzio-footer-col h5{
+        font-size:11px;
+        letter-spacing:3px;
+        margin-bottom:14px;
+    }
+    .stayzio-footer-col a{
+        font-size:14px;
+        padding:4px 0;
+        margin-bottom:4px;
+    }
+}

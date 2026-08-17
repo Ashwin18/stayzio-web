@@ -1,0 +1,90 @@
+@extends('vendors.layout')
+@section('section','Bookings')
+@section('page','Booking Details')
+@section('content')
+@php $sym = $currencyInfo->base_currency_symbol ?? '₹'; @endphp
+<div class="page-hdr">
+  <div class="page-hdr-left">
+    <h2>Booking #{{ $details->order_number }}</h2>
+    <p>{{ \Carbon\Carbon::parse($details->created_at)->format('d M Y, h:i A') }}</p>
+  </div>
+  <div class="page-hdr-actions">
+    <a href="{{ route('vendor.room_bookings.all_bookings',['language'=>$defaultLang->code]) }}" class="btn btn-secondary"><i class="ti ti-arrow-left"></i> Back</a>
+    @if($details->attachment)
+    <a href="{{ asset('assets/admin/img/attachment/'.$details->attachment) }}" target="_blank" class="btn btn-secondary"><i class="ti ti-paperclip"></i> Receipt</a>
+    @endif
+    @if($details->invoice)
+    <a href="{{ asset('assets/file/invoices/room/'.$details->invoice) }}" target="_blank" class="btn btn-secondary"><i class="ti ti-file-download"></i> Customer Voucher</a>
+    @endif
+  </div>
+</div>
+<div style="display:grid;grid-template-columns:2fr 1fr;gap:14px">
+  <div class="card">
+    <div class="card-hdr"><div class="card-title">Booking Information</div></div>
+    <div class="card-body">
+      @php
+        $hc = optional($details->hotel)->hotel_contents->first();
+        $rc = optional($details->hotelRoom)->room_content->first();
+        $h  = $details->hour??0;
+      @endphp
+      <div class="stat-row"><span class="stat-lbl">Order Number</span><span class="stat-val">#{{ $details->order_number }}</span></div>
+      <div class="stat-row"><span class="stat-lbl">Hotel</span><span class="stat-val">{{ optional($hc)->title??'—' }}</span></div>
+      <div class="stat-row"><span class="stat-lbl">Room</span><span class="stat-val">{{ optional($rc)->name??'—' }}</span></div>
+      <div class="stat-row"><span class="stat-lbl">Check-in Date</span><span class="stat-val">{{ \Carbon\Carbon::parse($details->check_in_date)->format('d M Y') }}</span></div>
+      <div class="stat-row"><span class="stat-lbl">Check-in Time</span><span class="stat-val">{{ $details->check_in_time }}</span></div>
+      <div class="stat-row"><span class="stat-lbl">Duration</span><span class="stat-val">
+        @if($h<=3)<span class="slot s3">{{ $h }} hours</span>
+        @elseif($h<=6)<span class="slot s6">{{ $h }} hours</span>
+        @elseif($h<=12)<span class="slot s12">{{ $h }} hours</span>
+        @else<span class="slot sf">Full Day</span>@endif
+      </span></div>
+      <div class="stat-row"><span class="stat-lbl">Check-out</span><span class="stat-val">{{ $details->check_out_date ? \Carbon\Carbon::parse($details->check_out_date)->format('d M Y').' '.$details->check_out_time : '—' }}</span></div>
+      <div class="stat-row"><span class="stat-lbl">Adults</span><span class="stat-val">{{ $details->adult??0 }}</span></div>
+      <div class="stat-row"><span class="stat-lbl">Children</span><span class="stat-val">{{ $details->children??0 }}</span></div>
+      @if($details->additional_service)
+      <div class="stat-row"><span class="stat-lbl">Add-ons</span><span class="stat-val">{{ $details->additional_service }}</span></div>
+      @endif
+    </div>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:14px">
+    <div class="card">
+      <div class="card-hdr"><div class="card-title">Guest Details</div></div>
+      <div class="card-body">
+        <div class="stat-row"><span class="stat-lbl">Name</span><span class="stat-val">{{ $details->booking_name??'—' }}</span></div>
+        <div class="stat-row"><span class="stat-lbl">Email</span><span class="stat-val">{{ $details->booking_email??'—' }}</span></div>
+        <div class="stat-row"><span class="stat-lbl">Phone</span><span class="stat-val">{{ $details->booking_phone??'—' }}</span></div>
+        <div class="stat-row"><span class="stat-lbl">Address</span><span class="stat-val">{{ $details->booking_address??'—' }}</span></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-hdr"><div class="card-title">Payment Summary</div></div>
+      <div class="card-body">
+        <div class="stat-row"><span class="stat-lbl">Room Price</span><span class="stat-val">{{ $sym }}{{ number_format($details->room_price??0,0) }}</span></div>
+        @if($details->tax_amount>0)
+        <div class="stat-row"><span class="stat-lbl">Tax</span><span class="stat-val">{{ $sym }}{{ number_format($details->tax_amount??0,0) }}</span></div>
+        @endif
+        @if($details->discount>0)
+        <div class="stat-row"><span class="stat-lbl">Discount</span><span class="stat-val text-green">-{{ $sym }}{{ number_format($details->discount??0,0) }}</span></div>
+        @endif
+        <div class="stat-row" style="border-top:1px solid var(--border);padding-top:10px;margin-top:4px">
+          <span class="stat-lbl" style="font-weight:700;color:var(--text)">Grand Total</span>
+          <span class="stat-val" style="font-size:16px">{{ $sym }}{{ number_format($details->grand_total??0,0) }}</span>
+        </div>
+        @if(($details->commission_price??0) > 0)
+        <div class="stat-row"><span class="stat-lbl">Platform Commission</span><span class="stat-val" style="color:#dc3545">-{{ $sym }}{{ number_format($details->commission_price??0,0) }}</span></div>
+        <div class="stat-row" style="border-top:1px solid var(--border);padding-top:10px;margin-top:4px">
+          <span class="stat-lbl" style="font-weight:700;color:var(--text)">Your Payout</span>
+          <span class="stat-val" style="font-size:16px;color:var(--green)">{{ $sym }}{{ number_format(($details->grand_total??0) - ($details->commission_price??0),0) }}</span>
+        </div>
+        @endif
+        <div class="stat-row"><span class="stat-lbl">Method</span><span class="stat-val"><span class="badge blue no-dot">{{ ucfirst($details->payment_method??'—') }}</span></span></div>
+        <div class="stat-row"><span class="stat-lbl">Payment</span><span class="stat-val">
+          @if($details->payment_status==1)<span class="badge green">Paid</span>
+          @elseif($details->payment_status==2)<span class="badge red">Rejected</span>
+          @else<span class="badge amber">Pending</span>@endif
+        </span></div>
+      </div>
+    </div>
+  </div>
+</div>
+@endsection

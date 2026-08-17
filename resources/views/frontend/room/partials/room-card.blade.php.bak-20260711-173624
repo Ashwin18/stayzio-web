@@ -1,0 +1,324 @@
+@php
+    $city = null;
+    $state = null;
+    $country = null;
+
+    if ($room->city_id) {
+        $city = App\Models\Location\City::find($room->city_id)?->name;
+    }
+
+    if ($room->state_id) {
+        $state = App\Models\Location\State::find($room->state_id)?->name;
+    }
+
+    if ($room->country_id) {
+        $country = App\Models\Location\Country::find($room->country_id)?->name;
+    }
+
+    $amenities = json_decode($room->amenities ?? '[]', true) ?? [];
+    $roomImages = App\Models\RoomImage::where('room_id', $room->id)->get();
+
+    // Fallback: if this room has no room-specific gallery photos, use the hotel-level gallery instead
+    if ($roomImages->count() > 0) {
+        $galleryImages = $roomImages;
+        $galleryFolder = 'assets/img/room/room-gallery/';
+    } else {
+        $galleryImages = \Illuminate\Support\Facades\DB::table('hotel_images')->where('hotel_id', $room->hotel_id)->get();
+        $galleryFolder = 'assets/img/hotel/hotel-gallery/';
+    }
+
+    $checkInDates = request()->input('checkInDates');
+    $checkInTime  = request()->input('checkInTime') ?? request()->input('checkInTimes'); 
+    
+    if (!isset($checkInDates) || empty($checkInDates)) {
+       $checkInDates = date('Y-m-d');       
+    }
+
+    $prices = collect(); // Default fallback to empty array/collection if room is unavailable
+
+    if (!empty($checkInDates)) {
+        $check_in_date = date('Y-m-d', strtotime($checkInDates));
+        
+        // 1. Fetch individual daily inventory configurations
+        $dailyInventory = \DB::table('hotel_daily_inventories')
+            ->where('hotel_id', $room->hotel_id)
+            ->where('booking_date', $check_in_date)
+            ->first();
+
+        // 2. "Blocked" (holiday/maintenance) still blocks everything; "Sold Out" per-duration is handled below
+        $isBlocked = $dailyInventory && $dailyInventory->status === 'Blocked';
+
+        if (!$isBlocked) {
+        
+            // 3. Collect standard structural hourly pricing profiles
+            $prices = App\Models\HourlyRoomPrice::where('room_id', $room->id)
+                ->join('booking_hours', 'hourly_room_prices.hour_id', '=', 'booking_hours.id')
+                ->where('hourly_room_prices.price', '!=', null)
+                ->orderBy('booking_hours.serial_number')
+                ->select('hourly_room_prices.*', 'booking_hours.serial_number')
+                ->get();
+
+            // 4. Overlay specialized pricing matrix updates if specific date rules exist
+            if ($dailyInventory) {
+            
+               
+                foreach ($prices as $priceItem) {
+                    if ($priceItem->hour == 3 && !empty($dailyInventory->rate_3hrs)) {
+                        $priceItem->price = $dailyInventory->rate_3hrs;
+                    } elseif ($priceItem->hour == 6 && !empty($dailyInventory->rate_6hrs)) {
+                        $priceItem->price = $dailyInventory->rate_6hrs;
+                    } elseif ($priceItem->hour == 12 && !empty($dailyInventory->rate_12hrs)) {
+                        $priceItem->price = $dailyInventory->rate_12hrs;
+                    } elseif ($priceItem->hour == 24 && !empty($dailyInventory->rate_fullday)) {
+                        $priceItem->price = $dailyInventory->rate_fullday;
+                    }
+                }
+
+                // 5. Per-duration sold-out filtering: a duration drops out if manually marked Sold Out
+                //    for that specific slot, or if real bookings have filled capacity for it.
+                //    Legacy blanket 'Sold Out' status still empties everything (safety net / backward compat).
+                if ($dailyInventory->status === 'Sold Out') {
+                    $prices = collect();
+                } else {
+                    $prices = $prices->filter(function ($priceItem) use ($dailyInventory) {
+                        $durationField = $priceItem->hour <= 3 ? '3hrs' : ($priceItem->hour <= 6 ? '6hrs' : 'fullday');
+                        $manualStatus = $dailyInventory->{'manual_status_' . $durationField} ?? null;
+                        $soldCount = $dailyInventory->{'rooms_sold_' . $durationField} ?? 0;
+                        $isDurationSoldOut = ($manualStatus === 'Sold Out') || ($soldCount >= $dailyInventory->total_rooms);
+                        return !$isDurationSoldOut;
+                    })->values();
+                }
+            }
+        }
+    } else {
+        // Fallback: If no date filter is actively searched, fall back to default structural database pricing
+        $prices = App\Models\HourlyRoomPrice::where('room_id', $room->id)
+            ->join('booking_hours', 'hourly_room_prices.hour_id', '=', 'booking_hours.id')
+            ->where('hourly_room_prices.price', '!=', null)
+            ->orderBy('booking_hours.serial_number')
+            ->select('hourly_room_prices.*', 'booking_hours.serial_number')
+            ->get();
+    }
+@endphp
+
+<div class="hotel-card {{ $featured ? 'featured' : '' }}">
+
+    @if($featured)
+        <div class="featured-crown">
+            ⭐ FEATURED
+        </div>
+    @endif
+
+    {{-- IMAGE SECTION --}}
+    <div class="card-img-wrap">
+
+        <a href="{{ route('frontend.hotel.details', ['slug' => $room->hotelSlug, 'id' => $room->hotelId]) }}">
+            {{-- CHANGE 1: Added class "hotel-card-main-img" to identify the target --}}
+            <img
+                class="hotel-card-main-img"
+                src="{{ !empty($room->feature_image)
+                    ? asset('assets/img/room/featureImage/' . $room->feature_image)
+                    : asset('assets/front/images/no-image.jpg') }}"
+                alt="{{ $room->title }}"
+                loading="lazy"
+            >
+        </a>
+
+        {{-- BADGES --}}
+        <div class="img-badges">
+            @if(!empty($room->is_featured) && !$featured)
+                <span class="img-badge red"><i class="fas fa-crown" style="font-size:9px"></i> Featured</span>
+            @endif
+            @if($featured)
+                <span class="img-badge red">
+                    <i class="fas fa-bolt"></i>
+                    Best Seller
+                </span>
+            @endif
+
+            @php
+                $hotelCoupleFriendly = optional($room->hotel)->couple_friendly ?? 0;
+            @endphp
+            @if($hotelCoupleFriendly)
+                <span class="img-badge pink">
+                    <i class="fas fa-heart"></i>
+                    Couple Friendly
+                </span>
+            @endif
+        </div>
+
+        {{-- WISHLIST --}}
+        @if(Auth::guard('web')->check())
+            @php
+                $user_id = Auth::guard('web')->user()->id;
+                $checkWishList = checkroomWishList($room->id, $user_id);
+            @endphp
+        @else
+            @php
+                $checkWishList = false;
+            @endphp
+        @endif
+
+        <a
+            href="{{ $checkWishList == false
+                    ? route('addto.wishlist.room', $room->id)
+                    : route('remove.wishlist.room', $room->id) }}"
+            class="wishlist-btn {{ $checkWishList ? 'active' : '' }}"
+        >
+            <i class="{{ $checkWishList ? 'fas' : 'far' }} fa-heart"></i>
+        </a>
+
+        {{-- ROOM/HOTEL GALLERY --}}
+        @if($galleryImages->count() > 0)
+            <div class="img-thumbs">
+                @foreach($galleryImages->take(3) as $img)
+                    <div class="img-thumb">
+                        {{-- 
+                           CHANGE 2 & 3: 
+                           - Added class "hotel-card-thumb-img" to identify click trigger
+                           - Added pointer cursor style for UX
+                        --}}
+                        <img
+                            class="hotel-card-thumb-img"
+                            src="{{ asset($galleryFolder . $img->image) }}"
+                            alt="{{ $room->title }}"
+                            loading="lazy"
+                            onerror="this.style.display='none'"
+                            style="cursor: pointer;"
+                        >
+                    </div>
+                @endforeach
+            </div>
+        @endif
+    </div>
+
+    {{-- CARD BODY --}}
+    <div class="card-body">
+        <div>
+            {{-- TOP --}}
+            <div class="card-top">
+                <div>
+                    <h3 class="card-name">
+                        <a href="{{ route('frontend.hotel.details', [
+                            'slug' => $room->hotelSlug,
+                            'id' => $room->hotelId
+                        ]) }}">
+                         {{ $room->hotelName ?? $room->title }}
+                        </a>
+                    </h3>
+
+                    <div class="card-location">
+                        <i class="fas fa-map-marker-alt"></i>
+                        {{ $city ?? '' }}
+                        @if(!empty($state))
+                            , {{ $state }}
+                        @endif
+                        @if(!empty($country))
+                            , {{ $country }}
+                        @endif
+                        @if(!empty($room->distance))
+                            · {{ number_format($room->distance, 2) }} KM
+                        @endif
+                    </div>
+                </div>
+
+                <div class="card-rating">
+                    <span class="rating-badge">
+                        {{ number_format($room->average_rating ?? 0, 1) }}
+                    </span>
+                    <span class="rating-text">
+                        {{ totalRoomReview($room->id) }}
+                        Reviews
+                    </span>
+                </div>
+            </div>
+
+            {{-- TAGS --}}
+            <div class="card-tags">
+                <span class="ctag highlight">
+                    ✓ Free Cancellation
+                </span>
+                <span class="ctag">
+                    Instant Confirm
+                </span>
+                @if(!empty($room->stars))
+                    <span class="ctag">
+                        {{ $room->stars }} Star
+                    </span>
+                @endif
+            </div>
+
+            {{-- AMENITIES --}}
+            @if(!empty($amenities) && count($amenities) > 0)
+                <div class="amenities">
+                    @foreach($amenities as $index => $amenity)
+                        @php
+                            if($index >= 6){
+                                break;
+                            }
+                            $amin = App\Models\Amenitie::find($amenity);
+                        @endphp
+                        @if($amin)
+                            <span class="amenity">
+                                <i class="{{ $amin->icon }}"></i>
+                                {{ $amin->title }}
+                            </span>
+                        @endif
+                    @endforeach
+                </div>
+            @endif
+        </div>
+
+        {{-- FOOTER --}}
+        <div class="card-footer">
+            @if($prices->count() > 0)
+                <div class="duration-tabs">
+                    @foreach($prices as $key => $price)
+                    <div class="dtab {{ $key == 0 ? 'active' : '' }}">
+                        <span class="dtab-label">
+                            @if($price->hour == 24 || strtolower($price->hour) == 'full day')
+                                Full Day
+                            @elseif($price->hour == 12)
+                                12 Hrs
+                            @elseif($price->hour == 6)
+                                6 Hrs
+                            @else
+                                {{ $price->hour }} Hrs
+                            @endif
+                        </span>
+                        <span class="dtab-price">{{ symbolPrice($price->price) }}</span>
+                        <span class="dtab-sub">/ slot</span>
+                    </div>
+                    @endforeach
+                </div>
+            @else
+                <div style="display:flex;align-items:center;gap:6px;padding:10px 0;color:#dc3545;font-weight:600;font-size:13px">
+                    <i class="fas fa-exclamation-circle"></i> Sold Out / Unavailable
+                </div>
+            @endif
+
+            <div class="book-actions">
+                @php
+                    // Maintain dynamic persistence when clicking forward to details page 
+                    $linkParams = ['slug' => $room->hotelSlug, 'id' => $room->hotelId];
+                    if (request()->has('checkInDates')) $linkParams['checkInDates'] = request()->input('checkInDates');
+                    if (request()->has('checkInTime')) $linkParams['checkInTime'] = request()->input('checkInTime');
+                    if (request()->has('checkInTimes')) $linkParams['checkInTimes'] = request()->input('checkInTimes');
+                @endphp
+
+                @if($prices->count() > 0)
+                <a href="{{ route('frontend.hotel.details', $linkParams) }}" class="btn-book">
+                    Book Now →
+                </a>
+                @else
+                <span class="btn-book" style="opacity:0.5;cursor:not-allowed;pointer-events:none" title="No availability for this date">
+                    Sold Out
+                </span>
+                @endif
+                <a href="{{ route('frontend.hotel.details', $linkParams) }}" class="btn-view-more">
+                    View Details
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

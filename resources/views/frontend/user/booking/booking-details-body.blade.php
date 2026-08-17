@@ -1,0 +1,167 @@
+<div class="bkd-page">
+<div class="bkd-wrap">
+
+<a href="{{ route('user.dashboard') }}" class="bkd-back">
+  <i class="fas fa-arrow-left"></i> Back to My Bookings
+</a>
+
+{{-- Hero --}}
+<div class="bkd-hero">
+  <div class="bkd-hero-left">
+    <h1>Booking Details</h1>
+    <p>Booked on {{ $bookDate }}</p>
+    <div class="bkd-id-box">
+      <div>
+        <span>Booking ID</span>
+        <b>{{ $b->order_number }}</b>
+      </div>
+      <span class="bkd-status" style="border-color:rgba(255,255,255,.3)">
+        <i class="fas fa-circle" style="font-size:7px"></i> {{ $stLabel }}
+      </span>
+    </div>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:10px;align-items:flex-end">
+    <a href="{{ asset('assets/file/invoices/room/'.$b->invoice) }}"
+       class="bkd-btn bkd-btn-red" download>
+      <i class="fas fa-download"></i> Download Voucher
+    </a>
+    <a href="{{ url('/') }}" class="bkd-btn bkd-btn-out">
+      <i class="fas fa-home"></i> Home
+    </a>
+  </div>
+</div>
+
+<div style="display:grid;grid-template-columns:1.2fr 1fr;gap:20px">
+
+{{-- Left Column --}}
+<div>
+  {{-- Stay Info --}}
+  <div class="bkd-card">
+    <div class="bkd-card-hdr"><h3>Stay Information</h3></div>
+    <div class="bkd-card-body">
+      <div class="bkd-timeline">
+        <div class="bkd-tl-item" style="text-align:left">
+          <span>Check-in</span>
+          <b>{{ $checkInFmt }}</b>
+          <div style="font-size:12px;color:#e31e24;font-weight:700;margin-top:3px">{{ $checkInTime }}</div>
+        </div>
+        <div class="bkd-tl-sep">&#8594;</div>
+        <div class="bkd-tl-item">
+          <span>Duration</span>
+          <b style="color:#e31e24">{{ $b->hour }} Hr</b>
+        </div>
+        <div class="bkd-tl-sep">&#8594;</div>
+        <div class="bkd-tl-item" style="text-align:right">
+          <span>Check-out</span>
+          <b>{{ $checkOutFmt }}</b>
+          <div style="font-size:12px;color:#7a8394;font-weight:700;margin-top:3px">{{ $checkOutTime }}</div>
+        </div>
+      </div>
+      <div class="bkd-grid">
+        <div class="bkd-cell">
+          <span>Room</span>
+          <b>{{ optional($roomContent)->title ?? 'Room' }}</b>
+        </div>
+        <div class="bkd-cell">
+          <span>Guests</span>
+          <b>{{ $b->adult ?? 1 }} Adult{{ ($b->adult??1)>1?'s':'' }}</b>
+        </div>
+        <div class="bkd-cell">
+          <span>Guest Name</span>
+          <b>{{ $b->booking_name ?? '—' }}</b>
+        </div>
+        <div class="bkd-cell">
+          <span>Phone</span>
+          <b>{{ $b->booking_phone ?? '—' }}</b>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {{-- Vendor --}}
+  <div class="bkd-card">
+    <div class="bkd-card-hdr"><h3>Hotel / Vendor</h3></div>
+    <div class="bkd-card-body">
+      <div class="bkd-vendor">
+        <div class="bkd-vendor-avatar">&#127968;</div>
+        <div>
+          <div style="font-size:14px;font-weight:800;color:#111">{{ optional($seller)->name ?? 'StayZio' }}</div>
+          <div style="font-size:12px;color:#7a8394;margin-top:2px">{{ optional($seller)->email ?? '' }}</div>
+          <div style="font-size:12px;color:#7a8394">{{ optional($seller)->phone ?? '' }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+@include('frontend.user.booking.booking-details-right')
+
+</div>
+
+{{-- Cancellation Policy & Cancel — FULL WIDTH, embedded directly --}}
+@php
+  $_cNow = \Carbon\Carbon::now();
+  $_cCheckIn = \Carbon\Carbon::parse($b->check_in_date.' '.$b->check_in_time);
+  $_cHours = $_cNow->diffInHours($_cCheckIn, false);
+  $_cMins = \Carbon\Carbon::parse($b->created_at)->diffInMinutes($_cNow);
+  $_cCan = ($b->order_status ?? '') !== 'cancelled' && $_cCheckIn->isFuture();
+  $_cElig = $_cHours >= 24 || $_cMins <= 15;
+@endphp
+
+@if(($b->order_status ?? '') === 'cancelled')
+<div class="bkd-card" style="border-color:#fecaca;background:#fff5f5;margin-top:20px">
+  <div class="bkd-card-body">
+    <div style="display:flex;align-items:center;gap:10px;color:#dc2626;font-weight:800;margin-bottom:8px">
+      <i class="fas fa-ban"></i> Booking Cancelled
+    </div>
+    @if(($b->cancellation_refund_amount ?? 0) > 0)
+    <div style="font-size:12px;color:#7a8394;line-height:1.6">
+      Refund of <b style="color:#16a34a">{{ $fmt($b->cancellation_refund_amount) }}</b> will reflect within <b>5-7 business days</b>.
+    </div>
+    @else
+    <div style="font-size:12px;color:#7a8394;line-height:1.6">No refund applicable as per policy.</div>
+    @endif
+  </div>
+</div>
+@elseif($_cCan)
+<div class="bkd-card" style="margin-top:20px">
+  <div class="bkd-card-hdr"><h3>Cancellation Policy</h3></div>
+  <div class="bkd-card-body">
+    <div style="background:{{ $_cElig?'#f0fdf4':'#fef2f2' }};border-left:3px solid {{ $_cElig?'#16a34a':'#dc2626' }};padding:10px 12px;border-radius:6px;font-size:12px;line-height:1.7;margin-bottom:12px">
+      <b style="color:{{ $_cElig?'#16a34a':'#dc2626' }};display:block;margin-bottom:4px">
+        {!! $_cElig ? '<i class="fas fa-check-circle"></i> Eligible for Full Refund — '.$fmt($b->grand_total) : '<i class="fas fa-times-circle"></i> Not Eligible for Refund' !!}
+      </b>
+      {!! $_cHours>=24 ? 'Cancellation is 24+ hours before check-in — full refund applies.' : ($_cMins<=15 ? 'Booked '.$_cMins.' min ago. Within 15 min grace window — full refund.' : 'Within 24h of check-in, 15-min grace window passed — no refund.') !!}
+    </div>
+    <div style="font-size:11px;color:#7a8394;line-height:1.7;padding:10px 12px;background:#f9f7f6;border-radius:6px;margin-bottom:12px">
+      <b style="color:#1a1a2e;display:block;margin-bottom:4px">Refund Rules</b>
+      &bull; Full refund if cancelled <b>24+ hours before check-in</b><br>
+      &bull; Full refund if cancelled within <b>15 minutes of booking</b><br>
+      &bull; No refund for no-shows or mid-stay cancellations<br>
+      &bull; Eligible refunds reflect within <b>5-7 business days</b>
+    </div>
+    <form action="{{ route('frontend.room_booking.cancel_booking') }}" method="POST"
+          onsubmit="return confirm('{!! $_cElig ? 'You will receive full refund of '.$fmt($b->grand_total).'. Continue?' : 'No refund as per policy. Cancel anyway?' !!}')">
+      @csrf
+      <input type="hidden" name="booking_id" value="{{ $b->id }}">
+      <button type="submit" style="width:100%;padding:11px;background:#fee2e2;color:#dc2626;border:1.5px solid #fecaca;border-radius:10px;font-size:13px;font-weight:800;cursor:pointer">
+        <i class="fas fa-times-circle"></i> Cancel This Booking
+      </button>
+    </form>
+  </div>
+</div>
+@else
+{{-- Check-in has passed --}}
+<div class="bkd-card" style="margin-top:20px;border-color:#e5e7eb">
+  <div class="bkd-card-hdr"><h3>Cancellation</h3></div>
+  <div class="bkd-card-body">
+    <div style="background:#f9fafb;border-left:3px solid #6b7280;padding:10px 12px;border-radius:6px;font-size:12px;line-height:1.7;color:#374151">
+      <b style="color:#374151;display:block;margin-bottom:4px"><i class="fas fa-clock"></i> Cancellation Window Closed</b>
+      Your check-in time ({{ $checkInFmt }} at {{ $checkInTime }}) has already passed. As per our policy, bookings cannot be cancelled or refunded after the check-in time.
+    </div>
+  </div>
+</div>
+@endif
+
+</div>
+</div>

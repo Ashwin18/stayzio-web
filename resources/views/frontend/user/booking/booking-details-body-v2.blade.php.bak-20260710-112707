@@ -1,0 +1,154 @@
+<div class="bdv2">
+<div class="bdv2-wrap">
+
+<a href="{{ route('user.dashboard') }}" class="bdv2-back">
+  <i class="fas fa-arrow-left"></i> Back to My Bookings
+</a>
+
+{{-- Hero --}}
+<div class="bdv2-hero">
+  <div class="bdv2-hero-row">
+    <div style="flex:1;min-width:240px">
+      <h1>Booking Details</h1>
+      <p>Booked on {{ $bookedAt->format('d M Y, h:i A') }}</p>
+      <div class="bdv2-hero-id">
+        <div>
+          <span>BOOKING ID</span>
+          <b>{{ $b->order_number }}</b>
+        </div>
+        <span class="bdv2-status {{ $b->payment_status == 1 ? '' : ($b->payment_status == 2 ? 'rejected' : 'pending') }}">
+          <i class="fas fa-circle" style="font-size:6px"></i> {{ strtoupper($stLabel) }}
+        </span>
+      </div>
+    </div>
+    <div class="bdv2-hero-btns">
+      <a href="{{ $b->invoice ? asset('assets/file/invoices/room/'.$b->invoice) : '#' }}"
+         class="bdv2-btn bdv2-btn-white" {{ $b->invoice ? 'download' : '' }}>
+        <i class="fas fa-download"></i> Download Invoice
+      </a>
+      <a href="{{ url('/') }}" class="bdv2-btn bdv2-btn-out">
+        <i class="fas fa-home"></i> Home
+      </a>
+    </div>
+  </div>
+</div>
+
+<div class="bdv2-grid">
+
+{{-- Left Column --}}
+<div>
+  {{-- Hotel Hero Card --}}
+  <div class="bdv2-card">
+    <div class="bdv2-card-body">
+      <div class="bdv2-hotel">
+        <div class="bdv2-hotel-img">
+          @if($hotelImage)
+            <img src="{{ $hotelImage }}" alt="{{ $hotelName }}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+            <div class="bdv2-hotel-img-fallback" style="display:none">{{ strtoupper(substr($hotelName, 0, 2)) }}</div>
+          @else
+            <div class="bdv2-hotel-img-fallback">{{ strtoupper(substr($hotelName, 0, 2)) }}</div>
+          @endif
+        </div>
+        <div class="bdv2-hotel-info">
+          <b>{{ $hotelName }}</b>
+          <p><i class="fas fa-map-marker-alt" style="color:#e31e24"></i> {{ \Illuminate\Support\Str::limit($hotelAddr, 60) }}</p>
+          @if($hotelRating > 0)
+          <div class="bdv2-hotel-rating">
+            <i class="fas fa-star"></i> {{ number_format($hotelRating, 1) }}
+          </div>
+          @endif
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {{-- Stay Information --}}
+  <div class="bdv2-card">
+    <div class="bdv2-card-hdr"><h3>Stay Information</h3></div>
+    <div class="bdv2-card-body">
+      <div class="bdv2-timeline">
+        <div class="bdv2-tl-item l">
+          <span>Check-in</span>
+          <b>{{ $checkInDt ? $checkInDt->format('D, d M') : '—' }}</b>
+          <em>{{ $checkInTime }}</em>
+        </div>
+        <div class="bdv2-tl-sep">&#8594;</div>
+        <div class="bdv2-tl-item">
+          <span>Duration</span>
+          @if($isFullDay)
+            <b style="color:#e31e24">Full Day</b>
+            <em class="muted">{{ $nights }} night{{ $nights > 1 ? 's' : '' }}</em>
+          @else
+            <b style="color:#e31e24">{{ $b->hour }} Hours</b>
+            <em class="muted">Hourly</em>
+          @endif
+        </div>
+        <div class="bdv2-tl-sep">&#8594;</div>
+        <div class="bdv2-tl-item r">
+          <span>Check-out</span>
+          <b>{{ $checkOutDt ? $checkOutDt->format('D, d M') : ($checkInDt ? $checkInDt->format('D, d M') : '—') }}</b>
+          <em class="muted">{{ $checkOutTime }}</em>
+        </div>
+      </div>
+      <div class="bdv2-info-grid">
+        <div class="bdv2-info-cell"><span>Room</span><b>{{ optional($roomContent)->title ?? 'Room' }}</b></div>
+        <div class="bdv2-info-cell"><span>Guests</span><b>{{ $b->adult ?? 1 }} Adult{{ ($b->adult??1)>1?'s':'' }}{{ ($b->children??0)>0 ? ', '.($b->children).' Child' : '' }}</b></div>
+        <div class="bdv2-info-cell"><span>Guest Name</span><b>{{ $b->booking_name ?? '—' }}</b></div>
+        <div class="bdv2-info-cell"><span>Phone</span><b>{{ $b->booking_phone ?? '—' }}</b></div>
+      </div>
+      <div class="bdv2-meta">
+        <b>Booking Confirmed On</b>
+        {{ $bookedAt->format('d M Y') }} at {{ $bookedAt->format('h:i A') }}
+      </div>
+    </div>
+  </div>
+</div>
+
+{{-- Right Column --}}
+<div>
+  {{-- Payment Summary --}}
+  <div class="bdv2-card">
+    <div class="bdv2-card-hdr">
+      <h3>Payment Summary</h3>
+      <span style="font-size:10px;font-weight:800;padding:3px 9px;border-radius:12px;background:{{ $stColor }}1a;color:{{ $stColor }}">{{ $stLabel }}</span>
+    </div>
+    <div class="bdv2-card-body">
+      <div class="bdv2-price-row">
+        <span>Room Price ({{ $isFullDay ? 'Full Day' : $b->hour.' Hr' }})</span>
+        <b>{{ $fmt($roomPrice) }}</b>
+      </div>
+      @if($serviceTotal > 0)
+      <div class="bdv2-price-row">
+        <span>Add-on Services</span>
+        <b>{{ $fmt($serviceTotal) }}</b>
+      </div>
+      @endif
+      @if(($b->discount ?? 0) > 0)
+      <div class="bdv2-price-row">
+        <span>Discount</span>
+        <b style="color:#16a34a">-{{ $fmt($b->discount) }}</b>
+      </div>
+      @endif
+      @if(($b->tax ?? 0) > 0)
+      <div class="bdv2-price-row">
+        <span>Tax (GST)</span>
+        <b>{{ $fmt($b->tax) }}</b>
+      </div>
+      @endif
+      <div class="bdv2-price-row bdv2-price-total">
+        <span>Total Paid</span>
+        <b>{{ $fmt($b->grand_total) }}</b>
+      </div>
+      <div class="bdv2-payment-method">
+        <div class="bdv2-payment-method-lbl">PAYMENT METHOD</div>
+        <div class="bdv2-payment-method-val">{{ $b->payment_gateway ?? 'Online Payment' }}</div>
+      </div>
+    </div>
+  </div>
+
+  @include('frontend.user.booking.booking-details-cancel-v2')
+</div>
+
+</div>
+</div>
+</div>

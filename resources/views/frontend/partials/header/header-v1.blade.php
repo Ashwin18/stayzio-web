@@ -1,0 +1,134 @@
+<div id="stayzio-loader" class="stayzio-loader" aria-label="Loading StayZio">
+    <div class="stayzio-loader-card">
+        <img src="{{ asset('stayzio/images/stayzio-logo.png') }}?v=1786449192" alt="StayZio Logo">
+        <div class="stayzio-loader-line"><span></span></div>
+    </div>
+</div>
+
+<section class="navbar-section" style="background-color:#f5f0e8;">
+    <nav class="navbar navbar-expand-lg">
+        <div class="navbar-container container">
+
+            {{-- Logo --}}
+            <a class="navbar-brand stayzio-main-brand" href="{{ route('index') }}">
+                <img src="{{ asset('stayzio/images/stayzio-logo.png') }}?v=1786449192"
+                     alt="{{ $websiteInfo->website_title }}"
+                     class="stayzio-brand-logo">
+            </a>
+
+            {{-- Mobile Menu Button --}}
+            <button class="site-hamburger main-site-hamburger"
+                    type="button"
+                    aria-label="Open menu"
+                    onclick="toggleSiteMenu()">
+                <i class="fas fa-bars"></i>
+            </button>
+
+            {{-- Desktop Menu --}}
+            <div class="navbar-menu collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav gap-4 ms-auto">
+
+                    {{-- Help & Support --}}
+                    <li class="nav-item dropdown" id="helpDropdown">
+                        <a class="nav-link" href="#" data-bs-toggle="dropdown">
+                            Help & Support
+                            <i class="fa fa-chevron-down dropdown-icon"></i>
+                        </a>
+
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#">How it Works?</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="#">Contact Us</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="#">FAQ's</a></li>
+                        </ul>
+                    </li>
+
+                    {{-- Home --}}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('index') }}">Home</a>
+                    </li>
+
+                    {{-- List Hotel --}}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('vendor.signup') }}">List Hotel</a>
+                    </li>
+
+                    {{-- User Profile --}}
+
+                </ul>
+
+                {{-- Login / Signup Button --}}
+                <div class="button list-unstyled d-flex px-2">
+                    @auth('web')
+                        <a class="btn-rounded" href="{{ route('user.dashboard') }}">
+                            My Account
+                        </a>
+                    @else
+                        <a class="btn-rounded" href="{{ route('user.otp.show') }}">
+                            Login / Sign up
+                        </a>
+                    @endauth
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    {{-- Mobile Menu Backdrop --}}
+    <div class="site-menu-backdrop"
+         id="siteMenuBackdrop"
+         onclick="closeSiteMenu()"></div>
+
+    {{-- Mobile Menu --}}
+    <aside class="site-mobile-menu"
+           id="siteMobileMenu"
+           aria-hidden="true">
+
+        <div class="smm-head">
+            <a href="{{ route('index') }}" class="smm-brand">
+                <img src="{{ asset('stayzio/images/stayzio-logo.png') }}?v=1786449192"
+                     alt="{{ $websiteInfo->website_title }}"
+                     class="stayzio-brand-logo">
+                <span class="stayzio-brand-text">Stay<span>Zio</span></span>
+            </a>
+
+            <button type="button"
+                    onclick="closeSiteMenu()"
+                    aria-label="Close menu">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <a href="{{ route('index') }}">
+            <i class="fas fa-home"></i> Home
+        </a>
+
+        <a href="#">
+            <i class="fas fa-hotel"></i> Hotels
+        </a>
+
+        <a href="{{ route('vendor.signup') }}">
+            <i class="fas fa-building"></i> List Hotel
+        </a>
+
+        @auth('web')
+            <a href="{{ route('user.dashboard') }}">
+                <i class="fas fa-user"></i> My Profile
+            </a>
+        @endauth
+
+        <a href="#">
+            <i class="fas fa-headset"></i> Help & Support
+        </a>
+
+        @auth('web')
+            <a href="{{ route('user.otp.show') }}" class="smm-login">
+                <i class="fas fa-user-circle"></i> My Account
+            </a>
+        @else
+            <a href="{{ route('user.otp.show') }}" class="smm-login">
+                <i class="fas fa-sign-in-alt"></i> Login / Sign up
+            </a>
+        @endauth
+    </aside>
+</section>

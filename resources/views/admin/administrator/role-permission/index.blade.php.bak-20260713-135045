@@ -1,0 +1,32 @@
+@extends('admin.layout')
+@section('section','Staff & Roles')
+@section('page','Roles & Permissions')
+@section('content')
+<div class="page-hdr">
+  <div class="page-hdr-left"><h2>Roles & Permissions</h2><p>Configure what each role can access</p></div>
+  <div class="page-hdr-actions">
+    <a href="{{ route('admin.admin_management.registered_admins') }}" class="btn btn-secondary"><i class="ti ti-arrow-left"></i> Back to Admins</a>
+  </div>
+</div>
+@foreach($roles??[] as $role)
+<div class="card" style="margin-bottom:14px">
+  <div class="card-hdr">
+    <div><div class="card-title">{{ $role->name }}</div><div class="card-sub">Configure access permissions for this role</div></div>
+    <div style="display:flex;gap:8px">
+      <a href="{{ route('admin.admin_management.role.permissions',$role->id) }}" class="btn btn-primary btn-sm"><i class="ti ti-settings"></i> Edit Permissions</a>
+      <form action="{{ route('admin.admin_management.delete_role',['id'=>$role->id]) }}" method="POST" style="display:inline" onsubmit="return confirm('Delete this role?')">@csrf<button class="btn btn-danger btn-sm"><i class="ti ti-trash"></i></button></form>
+    </div>
+  </div>
+  <div class="card-body">
+    @php $perms = json_decode($role->permissions??'[]'); @endphp
+    <div style="display:flex;flex-wrap:wrap;gap:6px">
+      @if(is_array($perms))@foreach($perms as $p)<span class="badge blue no-dot">{{ $p }}</span>@endforeach@endif
+      @if(empty($perms))<span class="td-muted">No permissions assigned yet</span>@endif
+    </div>
+  </div>
+</div>
+@endforeach
+@if(empty($roles))
+<div class="card"><div class="card-body" style="text-align:center;padding:40px;color:var(--muted)"><i class="ti ti-shield" style="font-size:32px;display:block;margin-bottom:10px"></i>No roles created yet</div></div>
+@endif
+@endsection

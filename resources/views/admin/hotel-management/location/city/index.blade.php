@@ -1,0 +1,134 @@
+@extends('admin.layout')
+@section('section','Property / Locations')
+@section('page','Cities')
+@section('content')
+<div class="page-hdr">
+  <div class="page-hdr-left"><h2>Locations</h2><p>Countries, states and cities</p></div>
+  <div class="page-hdr-actions">
+    <button class="btn btn-danger btn-sm bulk-delete d-none" data-href="{{ route('admin.hotel_management.location.bulk_delete_city') }}"><i class="ti ti-trash"></i> Delete</button>
+    <button onclick="document.getElementById('createCityModal').style.display='flex'" class="btn btn-primary"><i class="ti ti-plus"></i> Add City</button>
+    <a href="{{ route('admin.hotel_management.location.nearby_areas',['language'=>$defaultLang->code]) }}" class="btn btn-secondary"><i class="ti ti-map-2"></i> Manage Nearby Areas</a>
+    <a href="{{ route('admin.hotel_management.location.nearby_areas',['language'=>$defaultLang->code]) }}" class="btn btn-secondary"><i class="ti ti-map-2"></i> Manage Nearby Areas</a>
+  </div>
+</div>
+<div style="display:flex;gap:8px;margin-bottom:14px">
+  <a href="{{ route('admin.hotel_management.location.countries',['language'=>$defaultLang->code]) }}" class="ftag"><i class="ti ti-globe"></i> Countries</a>
+  <a href="{{ route('admin.hotel_management.location.states',['language'=>$defaultLang->code]) }}" class="ftag"><i class="ti ti-map"></i> States</a>
+  <a href="{{ route('admin.hotel_management.location.city',['language'=>$defaultLang->code]) }}" class="ftag active"><i class="ti ti-map-pin"></i> Cities</a>
+</div>
+<div class="card">
+  <div class="tbl-wrap"><table>
+    <thead><tr>
+      <th><input type="checkbox" onchange="document.querySelectorAll('.bulk-check').forEach(c=>c.checked=this.checked)"></th>
+      <th>Image</th><th>Name</th><th>State</th><th>Country</th><th>Status</th><th>Actions</th>
+    </tr></thead>
+    <tbody>
+      @forelse($cities as $city)
+      <tr>
+        <td><input type="checkbox" class="bulk-check" data-val="{{ $city->id }}"></td>
+        <td>@if($city->feature_image)<img src="{{ asset('assets/img/location/city/'.$city->feature_image) }}" style="width:36px;height:36px;border-radius:6px;object-fit:cover">@else<div class="td-avatar"><i class="ti ti-map-pin"></i></div>@endif</td>
+        <td class="td-main">{{ $city->name }}</td>
+        <td class="td-muted">@if($city->state_id){{ optional($city->state)->name }}@else—@endif</td>
+        <td class="td-muted">@if($city->country_id){{ optional($city->country)->name }}@else—@endif</td>
+        <td>@if($city->status==1)<span class="badge green">Active</span>@else<span class="badge red">Inactive</span>@endif</td>
+        <td>
+          <div style="display:flex;gap:6px">
+            <button type="button" class="btn btn-secondary btn-xs" onclick="openEditCityModal({{ $city->id }}, {{ json_encode($city->name) }}, {{ json_encode($city->icon) }}, {{ json_encode($city->feature_image ? asset('assets/img/location/city/'.$city->feature_image) : '') }})"><i class="ti ti-edit"></i></button>
+            <form action="{{ route('admin.hotel_management.location.delete_city',['id'=>$city->id]) }}" method="POST" style="display:inline" onsubmit="return confirm('Delete?')">@csrf<button class="btn btn-danger btn-xs"><i class="ti ti-trash"></i></button></form>
+          </div>
+        </td>
+      </tr>
+      @empty<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--muted)">No cities found</td></tr>@endforelse
+    </tbody>
+  </table></div>
+  <div class="pagination">{{ $cities->links() }}<span class="pg-info">{{ $cities->firstItem() }}–{{ $cities->lastItem() }} of {{ $cities->total() }}</span></div>
+</div>
+<div id="createCityModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:999;align-items:center;justify-content:center">
+  <div style="background:var(--navy2);border:1px solid var(--border);border-radius:12px;width:500px;max-height:85vh;overflow-y:auto">
+    <div style="padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--navy2)">
+      <span class="fw6">Add City</span><button onclick="document.getElementById('createCityModal').style.display='none'" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:18px"><i class="ti ti-x"></i></button>
+    </div>
+    <div style="padding:16px">@include('admin.hotel-management.location.city.create')</div>
+  </div>
+</div>
+
+<div id="editCityModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:999;align-items:center;justify-content:center">
+  <div style="background:var(--navy2);border:1px solid var(--border);border-radius:12px;width:500px;max-height:85vh;overflow-y:auto">
+    <div style="padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--navy2)">
+      <span class="fw6">Edit City</span><button onclick="document.getElementById('editCityModal').style.display='none'" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:18px"><i class="ti ti-x"></i></button>
+    </div>
+    <div style="padding:16px">@include('admin.hotel-management.location.city.edit')</div>
+  </div>
+</div>
+
+<script>
+function openEditCityModal(id, name, icon, imageUrl) {
+  document.getElementById('in_id').value = id;
+  document.getElementById('in_name').value = name || '';
+  var iconField = document.getElementById('in_icon');
+  if (iconField) iconField.value = icon || '';
+  var preview = document.querySelector('#editCityModal .in_image');
+  if (preview && imageUrl) { preview.src = imageUrl; }
+  var form = document.getElementById('ajaxEditForm');
+  if (form) form.action = '{{ route("admin.hotel_management.location.update_city") }}';
+  document.getElementById('editCityModal').style.display = 'flex';
+}
+$(document).ready(function () {
+  $("#updateBtn").on('click', function (e) {
+    $(e.target).attr('disabled', true);
+    var ajaxForm = document.getElementById('ajaxEditForm');
+    var fd = new FormData(ajaxForm);
+    var url = $("#ajaxEditForm").attr('action');
+    $.ajax({
+      url: url,
+      method: 'POST',
+      data: fd,
+      processData: false,
+      contentType: false,
+      success: function (data) {
+        window.location.reload();
+      },
+      error: function (xhr) {
+        $(e.target).attr('disabled', false);
+        var errors = (xhr.responseJSON && xhr.responseJSON.errors) || {};
+        var msg = Object.keys(errors).map(function(k) {
+          return Array.isArray(errors[k]) ? errors[k][0] : errors[k];
+        }).join(', ');
+        alert(msg || 'An error occurred');
+      }
+    });
+  });
+});
+(function() {
+  document.addEventListener("submit", function(e) {
+    var form = e.target;
+    if (!form.closest || !form.closest("[id$=Modal]")) return;
+    e.preventDefault();
+    var btn = form.querySelector("button[type=submit]");
+    var origHtml = btn ? btn.innerHTML : "";
+    if (btn) { btn.disabled = true; btn.innerHTML = "Saving..."; }
+    fetch(form.action, {
+      method: "POST",
+      body: new FormData(form),
+      headers: { "X-Requested-With": "XMLHttpRequest" }
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      if (data.status === "success") {
+        window.location.reload();
+      } else {
+        var errors = data.errors || {};
+        var msg = Object.keys(errors).map(function(k) {
+          return Array.isArray(errors[k]) ? errors[k][0] : errors[k];
+        }).join(", ");
+        alert(msg || "An error occurred");
+        if (btn) { btn.disabled = false; btn.innerHTML = origHtml; }
+      }
+    })
+    .catch(function() {
+      if (btn) { btn.disabled = false; btn.innerHTML = origHtml; }
+    });
+  }, true);
+})();
+</script>
+@endsection

@@ -1,0 +1,995 @@
+@extends('frontend.layout')
+
+@section('pageHeading')
+    {{ __('Home') }}
+@endsection
+
+@section('metaKeywords')
+    @if (!empty($seoInfo))
+        {{ $seoInfo->meta_keyword_home }}
+    @endif
+@endsection
+
+@section('metaDescription')
+    @if (!empty($seoInfo))
+        {{ $seoInfo->meta_description_home }}
+    @endif
+@endsection
+
+
+@section('content')
+
+<style>
+.sz-hero-section{position:relative;margin-bottom:58px}
+.sz-hero-img{
+  height:220px;
+  background-size:cover;
+  background-position:center;
+  background-repeat:no-repeat;
+  position:relative;
+}
+.sz-hero-overlay{
+  position:absolute;inset:0;
+  background:linear-gradient(180deg,rgba(0,0,0,0.25) 0%,rgba(0,0,0,0.55) 100%);
+}
+.sz-hero-txt{
+  position:absolute;
+  top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  text-align:center;color:#fff;
+  width:100%;padding:0 20px;
+  z-index:2;
+}
+.sz-hero-txt h1{
+  font-family:'Poppins',sans-serif;
+  font-size:clamp(20px,3.5vw,38px);
+  font-weight:900;line-height:1.15;
+  margin:0 0 6px;
+  text-shadow:0 2px 12px rgba(0,0,0,0.4);
+}
+.sz-hero-txt p{
+  font-size:clamp(12px,1.4vw,15px);
+  color:rgba(255,255,255,0.85);
+  margin:0;
+}
+/* Search bar floats at bottom edge */
+.sz-search-float{
+  position:absolute;
+  bottom:-50px;
+  left:50%;transform:translateX(-50%);
+  width:calc(100% - 40px);
+  max-width:900px;
+  z-index:20;
+}
+.sz-search-inner{
+  background:#fff;
+  border-radius:14px;
+  padding:6px;
+  box-shadow:0 8px 40px rgba(0,0,0,0.18);
+  display:flex;
+  align-items:stretch;
+  gap:0;
+}
+.sz-search-inner .search-item1,
+.sz-search-inner .search-item2,
+.sz-search-inner .search-item3{
+  flex:1;
+  padding:10px 14px;
+  border-right:1.5px solid #f0ebe4;
+  cursor:pointer;
+  border-radius:10px;
+  transition:background .15s;
+  min-width:0;
+}
+.sz-search-inner .search-item3.time-section{border-right:none}
+.sz-search-inner .search-item1:hover,
+.sz-search-inner .search-item2:hover,
+.sz-search-inner .search-item3:hover{background:#f8fafc}
+.sz-search-inner .search-item1 span,
+.sz-search-inner .search-item2 span,
+.sz-search-inner .search-item3 span{
+  font-size:10px;font-weight:700;
+  color:#94a3b8;text-transform:uppercase;
+  letter-spacing:.05em;display:block;margin-bottom:3px;
+}
+.sz-search-inner .selected-city,
+.sz-search-inner #dateRangeDisplay,
+.sz-search-inner .selected-time{
+  font-size:13px;font-weight:700;color:#0c0c0e;margin:0;
+}
+.sz-search-inner .divider1,
+.sz-search-inner .divider2{display:none}
+.sz-search-inner .search-btn{
+  background:#e31e24;color:#fff;border:none;
+  border-radius:12px;padding:12px 24px;
+  font-family:'Poppins',sans-serif;font-size:13px;font-weight:800;
+  cursor:pointer;white-space:nowrap;
+  display:flex;align-items:center;gap:7px;
+  transition:.2s;flex-shrink:0;
+  box-shadow:0 4px 16px rgba(227,30,36,.3);
+  align-self:center;
+}
+.sz-search-inner .search-btn:hover{background:#c71c22}
+.sz-search-inner .dropdown-list{z-index:999}
+@media(max-width:768px){
+  .sz-hero-img{height:180px}
+  .sz-search-float{bottom:-88px;width:calc(100% - 24px)}
+  .sz-hero-section{margin-bottom:108px}
+  .sz-search-inner{flex-direction:column;padding:10px;gap:0}
+  .sz-search-inner .search-item1,
+  .sz-search-inner .search-item2,
+  .sz-search-inner .search-item3{
+    border-right:none;border-bottom:1px solid #f0ebe4;
+    border-radius:8px;width:100%;
+  }
+  .sz-search-inner .search-item3.time-section{border-bottom:none}
+  .sz-search-inner .search-btn{width:100%;justify-content:center;margin-top:8px}
+}
+</style>
+
+@php
+  $heroBg = null;
+  if(isset($sliderInfos) && $sliderInfos->count() > 0) {
+    $f = public_path("assets/img/hero/sliders/".$sliderInfos->first()->image);
+    if(file_exists($f)) $heroBg = asset("assets/img/hero/sliders/".$sliderInfos->first()->image);
+  }
+  if(!$heroBg && isset($images) && !empty($images->hero_section_image)) {
+    $f = public_path("assets/img/homepage/".$images->hero_section_image);
+    if(file_exists($f)) $heroBg = asset("assets/img/homepage/".$images->hero_section_image);
+  }
+  if(!$heroBg && file_exists(public_path("assets/img/homepage/default_hero.jpg"))) {
+    $heroBg = asset("assets/img/homepage/default_hero.jpg");
+  }
+@endphp
+
+<div class="sz-hero-section" id="heroSection">
+
+  {{-- Hero image --}}
+  <div class="sz-hero-img" style="{{ $heroBg ? "background-image:url('{$heroBg}');" : "background:linear-gradient(135deg,#1a0505 0%,#3d0c0c 100%);" }}">
+    <div class="sz-hero-overlay"></div>
+    <div class="sz-hero-txt">
+      <h1>Stay by the Hour,<br><span style="color:#ff8a8a">Not the Calendar</span></h1>
+      <p>Book premium hotel rooms across India's top cities</p>
+    </div>
+  </div>
+
+  {{-- Search bar floating at bottom edge --}}
+  <div class="sz-search-float">
+    <div class="sz-search-inner">
+      <div class="search-item1" id="locationDropdown">
+    <span> Where ?</span>
+    <!-- Set your default fallback city dynamically or leave a general placeholder -->
+    <p class="selected-city">
+        {{ $cities->first()->name ?? 'Delhi' }} <i class="fas fa-chevron-down"></i>
+    </p>
+    <ul class="dropdown-list">
+        @if($cities->isNotEmpty())
+            @foreach($cities as $city)
+                <!-- Using data attributes keeps tracking IDs handy for forms or API logic -->
+                <li data-id="{{ $city->id }}">{{ $city->name }}</li>
+            @endforeach
+        @else
+            <li>No Cities Available</li>
+        @endif
+        <li>All Cities</li>
+    </ul>
+</div>
+      <div class="search-item2" id="dateDropdownTrigger">
+    <span> When ?</span>
+    @php
+        // Generate current dates programmatically
+        $todayStr = date('d M y');
+        $tomorrowStr = date('d M y');
+    @endphp
+    <p id="dateRangeDisplay">{{ $todayStr }}<i class="fas fa-chevron-down"></i></p>
+    <div class="date-popup" id="customDatePopup">
+        <div class="date-popup-header">
+            <button class="close-date-popup" id="closeDatePopupBtn"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="calendar-months" id="calendarMonths"></div>
+        <div class="date-popup-footer">
+            <div class="selected-range-text" id="selectedRangeText">{{ $todayStr }} → {{ $tomorrowStr }}</div>
+            <button class="apply-date-btn" id="applyDateBtn">Apply dates <i class="fas fa-check"></i></button>
+        </div>
+    </div>
+</div>
+      <div class="search-item3 time-section" id="timeDropdown">
+                    <span> What Time ?</span>
+                    <p class="selected-time">06:00 PM <i class="fas fa-chevron-down arrow"></i></p>
+                    <div class="time-box">
+                        <div class="time-toggle">
+                            <button type="button" class="active" data-type="am">AM</button>
+                            <button type="button" data-type="pm">PM</button>
+                        </div>
+                        <div class="time-list"></div>
+                    </div>
+                </div>
+      <button class="search-btn" id="searchSubmitBtn" onclick="submitHomeSearch()" type="button">
+        <i class="fas fa-search"></i> Search
+      </button>
+    </div>
+  </div>
+
+</div>
+
+@if ($secInfo->city_section_status == 1)
+@endif
+
+<section class="section">
+    <div class="section-header">
+        <div>
+            <h3>Nearby Hotels Around You</h3>
+            <p>Discover premium short stays close to your location with flexible durations and instant booking</p>
+            <button class="location-btn" id="useMyLocationBtn">
+                <svg viewBox="0 0 24 24" fill="currentColor" style="width:18px; height:18px; margin-right:5px; vertical-align:middle;">
+                    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
+                </svg>
+                <span id="locationBtnText">Use My Location</span>
+            </button>
+        </div>
+        <a href="{{ route('frontend.rooms') }}" class="view-all" id="viewAllNearbyLink">View All Nearby →</a>
+    </div>
+    <div class="filters" id="nearbyDistanceFilters">
+        <button class="filter-btn active" data-radius="3" data-filter="">Within 3 km</button>
+        <button class="filter-btn" data-radius="5" data-filter="">Within 5 km</button>
+        <button class="filter-btn" data-radius="10" data-filter="couple_friendly">Couple Friendly</button>
+        <button class="filter-btn" data-radius="15" data-filter="premium">Premium</button>
+        <button class="filter-btn" data-radius="20" data-filter="pay_at_hotel">Pay at Hotel</button>
+    </div>
+    
+    <div class="cards-grid" id="nearbyRoomsContainer">
+        @foreach ($room_contents->take(4) as $room)
+            @php
+                $check_in_date = request()->filled('checkInDates') ? date('Y-m-d', strtotime(request()->checkInDates)) : now()->format('Y-m-d');
+
+                $dailyInventory = DB::table('hotel_daily_inventories')
+                    ->where('hotel_id', $room->hotel_id)
+                    ->where('booking_date', $check_in_date)
+                    ->first();
+
+                $nearbyPrices = App\Models\HourlyRoomPrice::where('room_id', $room->id)
+                    ->where('hourly_room_prices.price', '!=', null)
+                    ->join('booking_hours', 'hourly_room_prices.hour_id', '=', 'booking_hours.id')
+                    ->orderBy('booking_hours.serial_number')
+                    ->select('hourly_room_prices.*', 'booking_hours.serial_number', 'booking_hours.hour')
+                    ->get();
+
+                if ($dailyInventory) {
+                    foreach ($nearbyPrices as $priceItem) {
+                        if ($priceItem->hour == 3 && !empty($dailyInventory->rate_3hrs)) {
+                            $priceItem->price = $dailyInventory->rate_3hrs;
+                        } elseif ($priceItem->hour == 6 && !empty($dailyInventory->rate_6hrs)) {
+                            $priceItem->price = $dailyInventory->rate_6hrs;
+                        } elseif ($priceItem->hour == 12 && !empty($dailyInventory->rate_12hrs)) {
+                            $priceItem->price = $dailyInventory->rate_12hrs;
+                        } elseif ($priceItem->hour == 24 && !empty($dailyInventory->rate_fullday)) {
+                            $priceItem->price = $dailyInventory->rate_fullday;
+                        }
+                    }
+                }
+
+                $nearbyStartingPrice = $nearbyPrices->first();
+                
+             
+    $city = null;
+    $state = null;
+    $country = null;
+
+    if ($room->city_id) {
+        $city = App\Models\Location\City::find($room->city_id)?->name;
+    }
+
+    if ($room->state_id) {
+        $state = App\Models\Location\State::find($room->state_id)?->name;
+    }
+
+    if ($room->country_id) {
+        $country = App\Models\Location\Country::find($room->country_id)?->name;
+    }
+
+                
+                
+                
+                
+            @endphp
+
+            <div class="card" onclick="window.location.href='{{ route('frontend.hotel.details', ['slug' => $room->hotelSlug, 'id' => $room->hotelId]) }}'">
+                <div class="card-img">
+                    <img src="{{ asset('assets/img/room/featureImage/' . $room->feature_image) }}" alt="{{ $room->title }}">
+                </div>
+                <div class="card-body">
+                    <div class="card-tags">
+                        <span class="tag">Hotel</span>
+                        @if(!empty($room->is_featured))
+                        <span class="tag red"><i class="fas fa-crown" style="font-size:10px"></i> Featured</span>
+                        @endif
+                        @if (($room->average_rating ?? 0) >= 4)
+                            <span class="tag red">Premium</span>
+                        @endif
+                    </div>
+                    <div class="card-title">{{ $room->hotelName }}</div>
+                    <div class="card-location">📍 {{ $city }},{{ $state }}</div>
+                    
+                    <div class="rating">
+                        <span class="star">★</span>
+                        <span class="rating-val">{{ number_format($room->average_rating ?? 0, 1) }}</span>
+                    </div>
+
+                    <div class="card-footer">
+                        <div>
+                            @if ($nearbyPrices->count() > 0)
+                                <div class="durations">
+                                    @foreach ($nearbyPrices as $index => $price)
+                                        <span class="dur {{ $index == 0 ? 'active' : '' }}"
+                                              data-price="{{ $price->price }}"
+                                              onclick="event.stopPropagation(); selectRoomPrice(this)">
+                                        {{ $price->hour == 24 ? 'FULLDAY' : $price->hour . 'H' }}
+                                        </span>
+                                    @endforeach
+                                </div>
+                            @endif
+                                  
+                            @if ($nearbyStartingPrice)
+                                <div class="price">
+                                    <strong class="dynamic-room-price">
+                                        {{ symbolPrice($nearbyStartingPrice->price) }}
+                                    </strong>
+                                    <span class="dynamic-room-label">
+                                        / {{ $nearbyStartingPrice->hour == 24 ? 'FULLDAY' : $nearbyStartingPrice->hour . 'hrs' }}
+                                    </span>
+                                </div>
+                            @endif
+                        </div>
+                        <button class="book-btn" type="button">Book Now</button>
+                    </div>
+                </div>
+            </div>
+        @endforeach
+    </div>
+</section>
+
+<section class="section">
+    <div class="section-header">
+        <div>
+            <h3>Choose Your Stay</h3>
+            <p>Flexible durations designed around your schedule</p>
+        </div>
+    </div>
+    <div class="stay-grid">
+        <div class="stay-card">
+            <div class="stay-icon">⏰</div>
+            <h3>Hourly Stay</h3>
+            <div class="stay-tag">3HR · 6HR · 9HR OPTIONS</div>
+            <ul class="p-0">
+                <li>Perfect for transit and business meetings</li>
+                <li>Between back-to-back appointments</li>
+                <li>Pay only for the hours you need</li>
+                <li>Instant booking and confirmation</li>
+            </ul>
+        </div>
+        <div class="stay-card">
+            <div class="stay-icon">🎉</div>
+            <h3>Surprise Events</h3>
+            <div class="stay-tag">ADD MAGIC AT CHECKOUT</div>
+            <ul class="p-0">
+                <li>Birthday and anniversary room setups</li>
+                <li>Romantic and proposal décor</li>
+                <li>Gift add-ons like cake, flowers, chocolates</li>
+                <li>Custom arrangements on request</li>
+            </ul>
+        </div>
+        <div class="stay-card">
+            <div class="stay-icon">🌙</div>
+            <h3>Full Day Stay</h3>
+            <div class="stay-tag">12 PM CHECK-IN &amp; 10 AM</div>
+            <ul class="p-0">
+                <li>Check in at noon, checkout at 10 AM</li>
+                <li>Ideal for weekend and overnight trips</li>
+                <li>Maximum value for extended stays</li>
+                <li>All hotel amenities included</li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+@if ($secInfo->featured_room_section_status == 1)
+<section class="section" style="background: var(--bg2);">
+    <div class="section-header">
+        <div>
+            <h3>Popular Hotels</h3>
+            <p>Handcrafted stays loved by our guests</p>
+        </div>
+        <a href="{{ route('frontend.rooms') }}" class="view-all">View All →</a>
+    </div>
+
+    <div class="cards-grid2">
+        @foreach ($room_contents->take(6) as $room)
+            @php
+                $check_in_date = request()->filled('checkInDates') ? date('Y-m-d', strtotime(request()->checkInDates)) : now()->format('Y-m-d');
+
+                $dailyInventory = DB::table('hotel_daily_inventories')
+                    ->where('hotel_id', $room->hotel_id)
+                    ->where('booking_date', $check_in_date)
+                    ->first();
+
+                $prices = App\Models\HourlyRoomPrice::where('room_id', $room->id)
+                    ->where('hourly_room_prices.price', '!=', null)
+                    ->join('booking_hours', 'hourly_room_prices.hour_id', '=', 'booking_hours.id')
+                    ->orderBy('booking_hours.serial_number')
+                    ->select('hourly_room_prices.*', 'booking_hours.serial_number', 'booking_hours.hour')
+                    ->get();
+
+                if ($dailyInventory) {
+                    foreach ($prices as $priceItem) {
+                        if ($priceItem->hour == 3 && !empty($dailyInventory->rate_3hrs)) {
+                            $priceItem->price = $dailyInventory->rate_3hrs;
+                        } elseif ($priceItem->hour == 6 && !empty($dailyInventory->rate_6hrs)) {
+                            $priceItem->price = $dailyInventory->rate_6hrs;
+                        } elseif ($priceItem->hour == 12 && !empty($dailyInventory->rate_12hrs)) {
+                            $priceItem->price = $dailyInventory->rate_12hrs;
+                        } elseif ($priceItem->hour == 24 && !empty($dailyInventory->rate_fullday)) {
+                            $priceItem->price = $dailyInventory->rate_fullday;
+                        }
+                    }
+                }
+
+                $startingPrice = $prices->first();
+                
+                 $city = null;
+    $state = null;
+    $country = null;
+
+    if ($room->city_id) {
+        $city = App\Models\Location\City::find($room->city_id)?->name;
+    }
+
+    if ($room->state_id) {
+        $state = App\Models\Location\State::find($room->state_id)?->name;
+    }
+
+    if ($room->country_id) {
+        $country = App\Models\Location\Country::find($room->country_id)?->name;
+    }
+    
+            @endphp
+
+            <div class="card" onclick="window.location.href='{{ route('frontend.hotel.details', ['slug' => $room->hotelSlug, 'id' => $room->hotelId]) }}'">
+                <div class="card-img">
+                    <img src="{{ asset('assets/img/room/featureImage/' . $room->feature_image) }}" alt="{{ $room->title }}">
+                </div>
+
+                <div class="card-body">
+                    <div class="card-tags">
+                        <span class="tag">Hotel</span>
+                        @if(!empty($room->is_featured))
+                        <span class="tag red"><i class="fas fa-crown" style="font-size:10px"></i> Featured</span>
+                        @endif
+                        @if (($room->average_rating ?? 0) >= 4)
+                            <span class="tag red">Premium</span>
+                        @endif
+                    </div>
+
+                    <div class="card-title">{{ $room->hotelName }}</div>
+                    <div class="card-location">📍 {{ $city }},{{ $state }}</div>
+
+                    <div class="rating">
+                        <span class="star">★</span>
+                        <span class="rating-val">{{ number_format($room->average_rating ?? 0, 1) }}</span>
+                    </div>
+                    
+                    <div class="card-footer">
+                        <div>
+                            @if ($prices->count() > 0)
+                                <div class="durations2">
+                                    @foreach ($prices as $index => $price)
+                                        <span class="dur {{ $index == 0 ? 'active' : '' }}"
+                                              data-price="{{ $price->price }}"
+                                              onclick="event.stopPropagation(); selectRoomPrice(this)">
+                                            {{ $price->hour == 24 ? 'FULLDAY' : $price->hour . 'H' }}
+                                        </span>
+                                    @endforeach
+                                </div>
+                            @endif
+                            @if ($startingPrice)
+                                <div class="price">
+                                    <strong class="dynamic-room-price">
+                                        {{ symbolPrice($startingPrice->price) }}
+                                    </strong>
+                                    <span class="dynamic-room-label">
+                                        / {{ $startingPrice->hour == 24 ? 'FULLDAY' : $startingPrice->hour . ' hrs' }}
+                                    </span>
+                                </div>
+                            @endif
+                        </div>
+                        <button class="book-btn2" type="button">Book Now</button>
+                    </div>
+                </div>
+            </div>
+        @endforeach
+    </div>
+</section>
+@endif
+
+<section class="section benefits-section">
+    <div class="section-header" style="justify-content: center; text-align: center; flex-direction: column; align-items: center;">
+        <h3>Benefits of Booking With Us</h3>
+        <p>Everything you need for the perfect short stay</p>
+    </div>
+    <div class="benefits-grid">
+        <div class="benefit">
+            <div class="benefit-icon">⏰</div>
+            <h4>Freedom of anytime check-in</h4>
+            <p>Book for 3h, 12h or a full day. Check in whenever you want.</p>
+        </div>
+        <div class="benefit">
+            <div class="benefit-icon">🗺️</div>
+            <h4>Hotels across all major cities</h4>
+            <p>Available in Mumbai, Delhi, Bangalore, Chennai and more cities.</p>
+        </div>
+        <div class="benefit">
+            <div class="benefit-icon">💰</div>
+            <h4>Budget to luxury properties</h4>
+            <p>From budget-friendly to star hotels. Find what fits your need.</p>
+        </div>
+        <div class="benefit">
+            <div class="benefit-icon">💑</div>
+            <h4>Couple friendly properties</h4>
+            <p>Unmarried couples welcome. Local ID accepted at check-in.</p>
+        </div>
+    </div>
+</section>
+
+<section class="milestones">
+    <h3>Our Milestones</h3>
+    <div class="milestones-grid">
+        <div class="milestone-item">
+            <div class="num">12</div>
+            <div class="label">Amazing Years</div>
+        </div>
+        <div class="milestone-item">
+            <div class="num">25+</div>
+            <div class="label">Cities</div>
+        </div>
+        <div class="milestone-item">
+            <div class="num">300+</div>
+            <div class="label">Hotels</div>
+        </div>
+        <div class="milestone-item">
+            <div class="num">2L+</div>
+            <div class="label">Happy Customers</div>
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="section-header">
+        <div>
+            <h3>Our Testimonials</h3>
+            <p>What our guests are saying</p>
+        </div>
+    </div>
+    <div class="testi-grid">
+        <div class="testi-card">
+            <div class="stars">★★★★★</div>
+            <p>"Amazing experience! The room was clean, staff was courteous, and the hourly booking made it so convenient. Highly recommend!"</p>
+            <div class="testi-author">
+                <div class="avatar">R</div>
+                <div>
+                    <div class="author-name">Raghava</div>
+                    <div class="author-time">2 days ago</div>
+                </div>
+            </div>
+        </div>
+        <div class="testi-card">
+            <div class="stars">★★¼</div>
+            <p>"Great value for money. Booked a 6-hour stay and it was perfect. WiFi was fast and the room had all amenities."</p>
+            <div class="testi-author">
+                <div class="avatar">R</div>
+                <div>
+                    <div class="author-name">Ramesh</div>
+                    <div class="author-time">7 days ago</div>
+                </div>
+            </div>
+        </div>
+        <div class="testi-card">
+            <div class="stars">★★★★★</div>
+            <p>"Booked the surprise birthday décor and it exceeded expectations! Will definitely book again."</p>
+            <div class="testi-author">
+                <div class="avatar">A</div>
+                <div>
+                    <div class="author-name">Amith</div>
+                    <div class="author-time">1 week ago</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<!--  FAQ section  -->
+<section class="section faq-section">
+    <div class="section-header"
+        style="justify-content: center; text-align: center; flex-direction: column; align-items: center; margin-bottom: 36px;">
+        <h3>FAQs about Hotel Booking</h3>
+    </div>
+    <div class="faq-list">
+        <div class="faq-item">
+            <div class="faq-q" onclick="toggleFaq(this) ">What is this platform and how does it work?</div>
+            <div class="faq-a">This is an hourly hotel booking platform where users can reserve stays for
+                shorter
+                durations like 3 hours, 8 hours, 12 hours, one night, or full day based on need.</div>
+        </div>
+        <div class="faq-item">
+            <div class="faq-q" onclick="toggleFaq(this)">Which cities are available?</div>
+            <div class="faq-a">We are currently available in 9+ cities across India including Mumbai, Delhi,
+                Bangalore, Chennai, Hyderabad, Kolkata, Pune, and more being added regularly.</div>
+        </div>
+        <div class="faq-item">
+            <div class="faq-q" onclick="toggleFaq(this)">What stay durations are available?</div>
+            <div class="faq-a">You can book stays for 3 hours, 6 hours, 8 hours, 12 hours, overnight, or a full day
+                depending on the hotel's availability.</div>
+        </div>
+        <div class="faq-item">
+            <div class="faq-q" onclick="toggleFaq(this)">Can people with local ID book rooms?</div>
+            <div class="faq-a">Yes, local ID is accepted at most of our partner hotels. You can filter hotels that
+                specifically accept local IDs using the filters on the search page.</div>
+        </div>
+        <div class="faq-item">
+            <div class="faq-q" onclick="toggleFaq(this)">Are the partnered hotels safe?</div>
+            <div class="faq-a">All partner hotels are verified and regularly audited for quality and safety
+                standards. Our team physically visits and rates each property before listing.</div>
+        </div>
+        <div class="faq-item">
+            <div class="faq-q" onclick="toggleFaq(this)">Are unmarried couples allowed to check-in?</div>
+            <div class="faq-a">Yes! We specifically list couple-friendly hotels that allow unmarried couples. You
+                can filter for "Couple Friendly" properties when searching.</div>
+        </div>
+    </div>
+</section>
+@endsection
+
+@section('script')
+<script>
+    
+function formatDateString(date) {
+    const year = date.getFullYear();
+    // Months are 0-indexed, so we add 1 and pad with a leading zero if needed
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    
+    return `${year}-${month}-${day}`; // Outputs format: YYYY-MM-DD
+}
+    
+// Add this helper object tracking setup inside your DOMContentLoaded block
+const today = new Date();
+today.setHours(0, 0, 0, 0); // Reset time parameters to focus solely on date boundaries
+const currentYear = today.getFullYear();
+const currentMonth = today.getMonth();
+const dayNumber = today.getDate();
+/* 
+  Inside your existing calendar loop structure where days are rendered:
+  Assuming you loop through days using a variable called 'currentLoopDate' 
+  and generate HTML for day items.
+*/
+
+// Example enforcement integration during standard grid loops:
+let cellDate = new Date(currentYear, currentMonth, dayNumber);
+
+if (cellDate < today) {
+    // 1. Add a visual CSS disabling selector class
+    // 2. Omit target event click handlers completely
+    dayCellHtml = `<div class="calendar-day disabled-past-date">${dayNumber}</div>`;
+} else {
+    dayCellHtml = `<div class="calendar-day clickable-date" data-date="${formatDateString(cellDate)}" onclick="handleDateSelect(this)">${dayNumber}</div>`;
+}    
+// State management variables for physical location tracking
+let userLatitude = null;
+let userLongitude = null;
+const currencySymbol = '{{ preg_replace('/[0-9,.\s]+/', '', symbolPrice(0)) }}';
+
+document.addEventListener("DOMContentLoaded", function () {
+    const searchBtn = document.getElementById('searchSubmitBtn');
+    if(searchBtn) {
+        searchBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            let urlParams = new URLSearchParams();
+
+            // City
+            var selCity = document.querySelector('#locationDropdown li.selected, #locationDropdown .selected-city');
+            var cityEl  = document.querySelector('#locationDropdown li.active, #locationDropdown li[data-selected="true"]');
+            if (cityEl && cityEl.dataset.id) {
+                urlParams.append('city', cityEl.dataset.id);
+            }
+
+            // Date
+            var dateVal = document.getElementById('selectedCheckInDate') || document.getElementById('checkInDateVal');
+            if (dateVal && dateVal.value) {
+                urlParams.append('checkInDates', dateVal.value);
+            } else {
+                // Try reading from display text
+                var dateDisplay = document.getElementById('dateRangeDisplay');
+                if (dateDisplay) {
+                    var rawDate = dateDisplay.dataset.rawDate || dateDisplay.dataset.date;
+                    if (rawDate) urlParams.append('checkInDates', rawDate);
+                }
+            }
+
+            // Time
+            var timeDisplay = document.querySelector('.selected-time');
+            if (timeDisplay) {
+                var timeText = timeDisplay.textContent.trim().replace(/[\s\n]+/g,' ').split('<')[0].trim();
+                if (timeText) urlParams.append('checkInTimes', timeText);
+            }
+
+            // Hour / Duration
+            var activeHour = document.querySelector('.hour-select.active, .dur-btn.active, [data-hour].active');
+            if (activeHour && activeHour.dataset.hour) {
+                urlParams.append('hour', activeHour.dataset.hour);
+            }
+
+            // Geolocation
+            if (userLatitude && userLongitude) {
+                urlParams.append('latitude', userLatitude);
+                urlParams.append('longitude', userLongitude);
+            }
+
+            window.location.href = "{{ route('frontend.rooms') }}?" + urlParams.toString();
+        });
+    }
+
+    // Bind Location Click Action
+    const locationBtn = document.getElementById('useMyLocationBtn');
+    if(locationBtn) {
+        locationBtn.addEventListener('click', function() {
+            getUserLocation();
+        });
+    }
+
+    // Bind Dynamic Tab Radius Distance Listeners
+    const targetTabs = document.querySelectorAll('#nearbyDistanceFilters .filter-btn');
+    targetTabs.forEach(tab => {
+        tab.addEventListener('click', function() {
+            targetTabs.forEach(t => t.classList.remove('active'));
+            this.classList.add('active');
+
+            // If location tracking is already authenticated, re-fetch records instantly
+            if(userLatitude && userLongitude) {
+                fetchNearbyRooms(userLatitude, userLongitude, this.dataset.radius, this.dataset.filter);
+            } else {
+                // Otherwise prompt physical hardware location authorization tracking
+                getUserLocation();
+            }
+        });
+    });
+});
+
+function getUserLocation() {
+    const btnText = document.getElementById('locationBtnText');
+    if (!navigator.geolocation) {
+        alert("Geolocation is not supported by your browser profile.");
+        return;
+    }
+
+    btnText.textContent = "Locating...";
+    
+    navigator.geolocation.getCurrentPosition(
+        function(position) {
+            userLatitude = position.coords.latitude;
+            userLongitude = position.coords.longitude;
+            btnText.textContent = "Location Linked";
+            
+            // Get data based on the currently selected tab's active threshold parameters
+            const activeTab = document.querySelector('#nearbyDistanceFilters .filter-btn.active');
+            const radius = activeTab ? activeTab.dataset.radius : 3;
+            const filter = activeTab ? activeTab.dataset.filter : "";
+            
+            // Sync primary link redirection address contexts 
+            const viewAllLink = document.getElementById('viewAllNearbyLink');
+            if(viewAllLink) {
+                viewAllLink.href = `{{ route('frontend.rooms') }}?latitude=${userLatitude}&longitude=${userLongitude}&radius=${radius}`;
+            }
+
+            fetchNearbyRooms(userLatitude, userLongitude, radius, filter);
+        },
+        function(error) {
+            btnText.textContent = "Use My Location";
+            switch(error.code) {
+                case error.PERMISSION_DENIED:
+                    alert("Location request was denied. Please allow location permissions in your browser.");
+                    break;
+                default:
+                    alert("Unable to retrieve your current position.");
+                    break;
+            }
+        },
+        { enableHighAccuracy: true, timeout: 8000 }
+    );
+}
+
+function fetchNearbyRooms(lat, lng, radius, filterType) {
+    const container = document.getElementById('nearbyRoomsContainer');
+    container.innerHTML = `<div style="grid-column: 1/-1; text-align:center; padding: 40px 0;"><i class="fas fa-spinner fa-spin fa-2x"></i><p class="mt-2">Finding hotels nearby...</p></div>`;
+
+    let url = `{{ route('frontend.nearby_rooms') }}?latitude=${lat}&longitude=${lng}&radius=${radius}&lang_id={{ $currentLanguageInfo->id ?? 1 }}`;
+    if(filterType) {
+        url += `&filter_type=${filterType}`;
+    }
+
+    fetch(url)
+        .then(response => response.json())
+        .then(res => {
+            if(res.success && res.data.length > 0) {
+                renderNearbyCards(res.data);
+            } else {
+                container.innerHTML = `<div style="grid-column: 1/-1; text-align:center; padding: 40px 0; color: #777;">📍 No hotels found within this range. Try increasing the distance radius filter above.</div>`;
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            container.innerHTML = `<div style="grid-column: 1/-1; text-align:center; padding: 40px 0; color: red;">Failed to retrieve records. Please refresh and try again.</div>`;
+        });
+}
+
+function renderNearbyCards(rooms) {
+    const container = document.getElementById('nearbyRoomsContainer');
+    container.innerHTML = ""; // Clear loader framework mappings
+
+    rooms.forEach(room => {
+        let premiumTag = parseFloat(room.average_rating || 0) >= 4 ? `<span class="tag red">Premium</span>` : '';
+        
+        // Formulate complete structured hourly button blocks dynamically
+        let durationSpanBlock = "";
+        if(room.prices && room.prices.length > 0) {
+            durationSpanBlock = `<div class="durations">`;
+            room.prices.forEach((price, idx) => {
+                let activeClass = idx === 0 ? 'active' : '';
+                let label = parseInt(price.hour) === 24 ? 'FULLDAY' : price.hour + 'H';
+                durationSpanBlock += `<span class="dur ${activeClass}" data-price="${price.price}" onclick="event.stopPropagation(); selectRoomPrice(this)">${label}</span>`;
+            });
+            durationSpanBlock += `</div>`;
+        }
+
+        let priceBlock = "";
+        if(room.startingPrice) {
+            let startLabel = parseInt(room.startingPrice.hour) === 24 ? 'FULLDAY' : room.startingPrice.hour + 'hrs';
+            priceBlock = `
+                <div class="price">
+                    <strong class="dynamic-room-price">${currencySymbol}${formatRoomPrice(room.startingPrice.price)}</strong>
+                    <span class="dynamic-room-label">/ ${startLabel}</span>
+                </div>`;
+        }
+
+        let cardHtml = `
+            <div class="card" onclick="window.location.href='${room.detail_url}'">
+                <div class="card-img">
+                    <img src="${room.image_url}" alt="${room.title}">
+                </div>
+                <div class="card-body">
+                    <div class="card-tags">
+                        <span class="tag">Hotel</span>
+                        @if(!empty($room->is_featured))
+                        <span class="tag red"><i class="fas fa-crown" style="font-size:10px"></i> Featured</span>
+                        @endif
+                        ${premiumTag}
+                    </div>
+                    <div class="card-title">${room.hotelName}</div>
+                    <div class="card-location">📍 ${room.city}, ${room.state}</div>
+                    
+                    <div class="rating">
+                        <span class="star">★</span>
+                        <span class="rating-val">${room.formatted_rating}</span>
+                    </div>
+
+                    <div class="card-footer">
+                        <div>
+                            ${durationSpanBlock}
+                            ${priceBlock}
+                        </div>
+                        <button class="book-btn" type="button">Book Now</button>
+                    </div>
+                </div>
+            </div>`;
+        container.insertAdjacentHTML('beforeend', cardHtml);
+    });
+}
+
+function toggleFaq(element) {
+    const answerBlock = element.nextElementSibling;
+    if (answerBlock) {
+        if (answerBlock.style.display === "block" || answerBlock.style.maxHeight) {
+            answerBlock.style.display = "none";
+            answerBlock.style.maxHeight = null;
+        } else {
+            answerBlock.style.display = "block";
+        }
+    }
+}
+
+function formatRoomPrice(value) {
+    return new Intl.NumberFormat('en-IN').format(value);
+}
+
+function selectRoomPrice(element) {
+    const buttonWrapper = element.parentElement;
+    if (buttonWrapper) {
+        buttonWrapper.querySelectorAll('.dur').forEach(function (item) {
+            item.classList.remove('active');
+        });
+    }
+
+    element.classList.add('active');
+    
+    const container = element.closest('.card');
+    const price = parseFloat(element.dataset.price || 0);
+
+    const priceEl = container.querySelector('.dynamic-room-price');
+    if (priceEl) {
+        priceEl.textContent = currencySymbol + formatRoomPrice(price);
+    }
+
+    const labelEl = container.querySelector('.dynamic-room-label');
+    if (labelEl) {
+        labelEl.textContent = '/ ' + element.textContent.trim().toLowerCase().replace('h', ' hrs');
+    }
+}
+</script>
+
+<script>
+// ── HOME PAGE SEARCH ──────────────────────────
+function submitHomeSearch() {
+  var city       = document.querySelector('.selected-city')?.textContent?.trim().replace(/[▼›]/g,'').trim() || '';
+  var date       = document.getElementById('dateRangeDisplay')?.dataset?.date || '';
+  var time       = document.querySelector('.selected-time')?.textContent?.trim().replace(/[▼›⌄]/g,'').trim() || '';
+  var rooms      = document.querySelectorAll('.guest-section .value')[1]?.textContent?.trim() || '1';
+  var adults     = document.querySelectorAll('.guest-section .value')[0]?.textContent?.trim() || '1';
+  var children   = document.querySelectorAll('.guest-section .value')[2]?.textContent?.trim() || '0';
+
+  var params = new URLSearchParams();
+  if (city && city !== 'All Cities') params.set('location_val', city);
+  if (date) params.set('checkInDates', date);
+  if (time) params.set('checkInTimes', time);
+  if (rooms)    params.set('room_qty', rooms);
+  if (adults)   params.set('adult', adults);
+  if (children) params.set('children', children);
+
+  window.location.href = '{{ route("frontend.rooms") }}?' + params.toString();
+}
+
+// City dropdown click
+document.querySelectorAll('.dropdown-list li').forEach(function(li) {
+  li.addEventListener('click', function() {
+    var txt = this.textContent.trim();
+    var cityEl = document.querySelector('.selected-city');
+    if(cityEl) cityEl.innerHTML = txt + ' <i class="fas fa-chevron-down"></i>';
+    document.getElementById('locationDropdown').classList.remove('active');
+  });
+});
+
+// Toggle city dropdown
+document.getElementById('locationDropdown')?.addEventListener('click', function(e) {
+  if(!e.target.closest('.dropdown-list')) this.classList.toggle('active');
+});
+
+// Close dropdowns on outside click
+document.addEventListener('click', function(e) {
+  if(!e.target.closest('#locationDropdown')) {
+    document.getElementById('locationDropdown')?.classList.remove('active');
+  }
+});
+
+// Store selected date for search
+document.getElementById('applyDateBtn')?.addEventListener('click', function() {
+  var display = document.getElementById('dateRangeDisplay');
+  if(display) {
+    // Get the first selected date from calendar
+    var selected = document.querySelector('.calendar-day.selected, .day.selected, [data-date].selected');
+    if(selected && selected.dataset.date) {
+      display.dataset.date = selected.dataset.date;
+    } else {
+      display.dataset.date = new Date().toISOString().split('T')[0];
+    }
+  }
+  document.getElementById('customDatePopup')?.classList.remove('show', 'active', 'open');
+});
+</script>
+@endsection
