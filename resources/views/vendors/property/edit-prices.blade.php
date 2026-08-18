@@ -3,6 +3,10 @@
 @section('page', 'Edit Prices')
 
 @section('content')
+<style>
+.edit-price-grid input:focus{border-color:#00B8B8!important;outline:none;box-shadow:0 0 0 3px rgba(0,184,184,.08)}
+@media(max-width:768px){.edit-price-grid{grid-template-columns:1fr!important;max-width:none!important}}
+</style>
 <div class="page-hdr">
   <div class="page-hdr-left">
     <h2>Edit Prices — {{ $property->hotel_name }}</h2>
@@ -19,29 +23,29 @@
   <div class="card-body">
     <form method="POST" action="{{ route('vendor.properties.update_prices', $property->id) }}">
       @csrf
-      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;max-width:700px">
-        <div style="background:rgba(227,30,36,.04);border:1.5px solid rgba(227,30,36,.15);border-radius:12px;padding:20px;text-align:center">
+      <div class="edit-price-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;max-width:700px">
+        <div style="background:rgba(0,184,184,.06);border:1.5px solid rgba(0,184,184,.20);border-radius:12px;padding:20px;text-align:center">
           <div style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;margin-bottom:8px">3 Hours</div>
           <div style="position:relative">
-            <span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:16px;font-weight:700;color:#e31e24">₹</span>
+            <span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:16px;font-weight:700;color:#00A6A6">₹</span>
             <input type="number" name="price_3hrs" value="{{ $property->price_3hrs }}"
-              style="width:100%;padding:12px 12px 12px 30px;border:1.5px solid #e8eaed;border-radius:8px;font-size:20px;font-weight:800;color:#e31e24;text-align:center;font-family:'Poppins',sans-serif" required min="0">
+              style="width:100%;padding:12px 12px 12px 30px;border:1.5px solid #e8eaed;border-radius:8px;font-size:20px;font-weight:800;color:#00A6A6;text-align:center;font-family:'Poppins',sans-serif" required min="0">
           </div>
         </div>
-        <div style="background:rgba(227,30,36,.04);border:1.5px solid rgba(227,30,36,.15);border-radius:12px;padding:20px;text-align:center">
+        <div style="background:rgba(0,184,184,.06);border:1.5px solid rgba(0,184,184,.20);border-radius:12px;padding:20px;text-align:center">
           <div style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;margin-bottom:8px">6 Hours</div>
           <div style="position:relative">
-            <span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:16px;font-weight:700;color:#e31e24">₹</span>
+            <span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:16px;font-weight:700;color:#00A6A6">₹</span>
             <input type="number" name="price_6hrs" value="{{ $property->price_6hrs }}"
-              style="width:100%;padding:12px 12px 12px 30px;border:1.5px solid #e8eaed;border-radius:8px;font-size:20px;font-weight:800;color:#e31e24;text-align:center;font-family:'Poppins',sans-serif" required min="0">
+              style="width:100%;padding:12px 12px 12px 30px;border:1.5px solid #e8eaed;border-radius:8px;font-size:20px;font-weight:800;color:#00A6A6;text-align:center;font-family:'Poppins',sans-serif" required min="0">
           </div>
         </div>
-        <div style="background:rgba(227,30,36,.04);border:1.5px solid rgba(227,30,36,.15);border-radius:12px;padding:20px;text-align:center">
+        <div style="background:rgba(0,184,184,.06);border:1.5px solid rgba(0,184,184,.20);border-radius:12px;padding:20px;text-align:center">
           <div style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;margin-bottom:8px">Full Day</div>
           <div style="position:relative">
-            <span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:16px;font-weight:700;color:#e31e24">₹</span>
+            <span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:16px;font-weight:700;color:#00A6A6">₹</span>
             <input type="number" name="price_fullday" value="{{ $property->price_fullday }}"
-              style="width:100%;padding:12px 12px 12px 30px;border:1.5px solid #e8eaed;border-radius:8px;font-size:20px;font-weight:800;color:#e31e24;text-align:center;font-family:'Poppins',sans-serif" required min="0">
+              style="width:100%;padding:12px 12px 12px 30px;border:1.5px solid #e8eaed;border-radius:8px;font-size:20px;font-weight:800;color:#00A6A6;text-align:center;font-family:'Poppins',sans-serif" required min="0">
           </div>
         </div>
       </div>

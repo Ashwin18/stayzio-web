@@ -43,126 +43,136 @@ class VendorPropertyController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
-            // Hotel info
+        $vendor = Auth::guard('vendor')->user();
+
+        $validated = $request->validate([
             'hotel_name'        => 'required|string|max:255',
             'address'           => 'required|string|max:1000',
             'city'              => 'required|string|max:100',
-            'pincode'           => 'required|digits:6',
-            'mobile_number'     => 'required|digits:10',
-            'reception_number'  => 'nullable|digits:10',
+            'pincode'           => ['required', 'regex:/^[1-9][0-9]{5}$/'],
+            'mobile_number'     => ['required', 'regex:/^[6-9][0-9]{9}$/'],
+            'reception_number'  => 'nullable|digits_between:10,12',
             'property_type'     => 'required|in:leased,owned',
 
-            // Room & pricing
             'room_type'         => 'required|string|max:100',
             'price_3hrs'        => 'required|numeric|min:0',
             'price_6hrs'        => 'required|numeric|min:0',
             'price_fullday'     => 'required|numeric|min:0',
             'total_rooms'       => 'required|integer|min:1',
 
-            // Policies
+            'perks'             => 'nullable|array',
+            'perks.*'           => 'integer',
+            'restrictions'      => 'nullable|array',
+            'restrictions.*'    => 'integer',
+
             'allow_same_city_couples'  => 'required|in:yes,no',
             'allow_outstation_couples' => 'required|in:yes,no',
             'allow_smoking_drinking'   => 'required|in:yes,no',
             'food_facility'            => 'required|in:yes,no',
             'cancellation_policy_acceptance' => 'required|in:yes',
 
-            // Owner / Manager (merged)
-            'owner_name'    => 'required|string|max:255',
-            'owner_contact' => 'required|digits:10',
+            'owner_name'        => 'required|string|max:255',
+            'owner_contact'     => ['required', 'regex:/^[6-9][0-9]{9}$/'],
+            'owner_email'       => 'required|email|max:255',
 
-            // GST & Bank
-            'gstin'               => 'required|string|max:15',
+            'gstin'               => ['required', 'string', 'max:15', 'regex:/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z][A-Z0-9]Z[A-Z0-9]$/i'],
             'gst_certificate'     => 'required|file|mimes:pdf,jpg,jpeg,png|max:5120',
             'bank_name'           => 'required|string|max:255',
             'account_holder_name' => 'required|string|max:255',
             'account_number'      => 'required|string|max:20',
-            'ifsc_code'           => 'required|string|max:11',
+            'ifsc_code'           => ['required', 'string', 'size:11', 'regex:/^[A-Z]{4}0[A-Z0-9]{6}$/i'],
             'branch_name'         => 'nullable|string|max:255',
             'cancelled_cheque'    => 'required|file|mimes:pdf,jpg,jpeg,png|max:5120',
         ]);
 
-        $vendorId = Auth::guard('vendor')->id();
+        $vendorId = $vendor->id;
 
-        // Handle file uploads
-        $gstPath = null;
-        $chequePath = null;
-
-        if ($request->hasFile('gst_certificate')) {
-            $file = $request->file('gst_certificate');
-            $gstPath = 'vendor-properties/' . uniqid('gst_') . '.' . $file->getClientOriginalExtension();
-            $file->move(public_path('assets/img/vendor-properties'), basename($gstPath));
+        $uploadDir = public_path('assets/img/vendor-properties');
+        if (!is_dir($uploadDir)) {
+            mkdir($uploadDir, 0755, true);
         }
 
-        if ($request->hasFile('cancelled_cheque')) {
-            $file = $request->file('cancelled_cheque');
-            $chequePath = 'vendor-properties/' . uniqid('cheque_') . '.' . $file->getClientOriginalExtension();
-            $file->move(public_path('assets/img/vendor-properties'), basename($chequePath));
+        $gstFile = $request->file('gst_certificate');
+        $gstPath = 'vendor-properties/' . uniqid('gst_', true) . '.' . strtolower($gstFile->getClientOriginalExtension());
+        $gstFile->move($uploadDir, basename($gstPath));
+
+        $chequeFile = $request->file('cancelled_cheque');
+        $chequePath = 'vendor-properties/' . uniqid('cheque_', true) . '.' . strtolower($chequeFile->getClientOriginalExtension());
+        $chequeFile->move($uploadDir, basename($chequePath));
+
+        try {
+            $property = DB::transaction(function () use ($request, $validated, $vendorId, $gstPath, $chequePath) {
+                return VendorProperty::create([
+                    'vendor_id'       => $vendorId,
+                    'hotel_name'      => $validated['hotel_name'],
+                    'address'         => $validated['address'],
+                    'city'            => $validated['city'],
+                    'pincode'         => $validated['pincode'],
+                    'mobile_number'   => $validated['mobile_number'],
+                    'reception_number'=> $validated['reception_number'] ?? null,
+                    'property_type'   => $validated['property_type'],
+
+                    'room_type'       => $validated['room_type'],
+                    'price_3hrs'      => $validated['price_3hrs'],
+                    'price_6hrs'      => $validated['price_6hrs'],
+                    'price_fullday'   => $validated['price_fullday'],
+                    'total_rooms'     => $validated['total_rooms'],
+
+                    'amenities'             => json_encode([]),
+                    'selected_perks'        => json_encode($request->input('perks', [])),
+                    'selected_restrictions' => json_encode($request->input('restrictions', [])),
+
+                    'allow_same_city_couples'        => $validated['allow_same_city_couples'],
+                    'allow_outstation_couples'       => $validated['allow_outstation_couples'],
+                    'allow_smoking_drinking'         => $validated['allow_smoking_drinking'],
+                    'food_facility'                  => $validated['food_facility'],
+                    'cancellation_policy_acceptance' => $validated['cancellation_policy_acceptance'],
+
+                    'owner_name'    => $validated['owner_name'],
+                    'owner_contact' => $validated['owner_contact'],
+                    'owner_email'   => $validated['owner_email'],
+
+                    'manager_name'        => null,
+                    'manager_number'      => null,
+                    'manager_designation' => null,
+                    'manager_email'       => null,
+
+                    'gstin'               => strtoupper($validated['gstin']),
+                    'gst_certificate'     => $gstPath,
+                    'bank_name'           => $validated['bank_name'],
+                    'account_holder_name' => $validated['account_holder_name'],
+                    'account_number'      => $validated['account_number'],
+                    'ifsc_code'           => strtoupper($validated['ifsc_code']),
+                    'branch_name'         => $validated['branch_name'] ?? null,
+                    'cancelled_cheque'    => $chequePath,
+                    'status'              => VendorProperty::STATUS_PENDING,
+                ]);
+            });
+        } catch (\Throwable $e) {
+            @unlink(public_path('assets/img/' . $gstPath));
+            @unlink(public_path('assets/img/' . $chequePath));
+            throw $e;
         }
 
-        // Collect amenities
-        $amenities = [];
-        foreach (['wifi', 'lcd_led', 'ac', 'water'] as $a) {
-            if ($request->has($a)) $amenities[] = $a;
+        try {
+            $vendorLabel = $vendor->username ?? $vendor->name ?? $vendor->email ?? ('Vendor #' . $vendorId);
+            AdminNotification::fire(
+                'property',
+                'New Property Submitted',
+                $vendorLabel . ' submitted "' . $property->hotel_name . '" for approval.',
+                url('admin/property-submissions/' . $property->id),
+                $property->id
+            );
+        } catch (\Throwable $e) {
+            \Log::warning('Property saved but admin notification failed', [
+                'property_id' => $property->id,
+                'vendor_id' => $vendorId,
+                'error' => $e->getMessage(),
+            ]);
         }
-
-        $property = VendorProperty::create([
-            'vendor_id'   => $vendorId,
-            'hotel_name'  => $request->hotel_name,
-            'address'     => $request->address,
-            'city'        => $request->city,
-            'pincode'     => $request->pincode,
-            'mobile_number'    => $request->mobile_number,
-            'reception_number' => $request->reception_number,
-            'property_type'    => $request->property_type,
-
-            'room_type'     => $request->room_type,
-            'price_3hrs'    => $request->price_3hrs,
-            'price_6hrs'    => $request->price_6hrs,
-            'price_fullday' => $request->price_fullday,
-            'total_rooms'   => $request->total_rooms,
-            'amenities'     => json_encode($amenities),
-            'selected_perks'        => json_encode($request->input('perks', [])),
-            'selected_restrictions' => json_encode($request->input('restrictions', [])),
-
-            'allow_same_city_couples'  => $request->allow_same_city_couples,
-            'allow_outstation_couples' => $request->allow_outstation_couples,
-            'allow_smoking_drinking'   => $request->allow_smoking_drinking,
-            'food_facility'            => $request->food_facility,
-            'cancellation_policy_acceptance' => $request->cancellation_policy_acceptance,
-
-            'owner_name'    => $request->owner_name,
-            'owner_contact' => $request->owner_contact,
-            'owner_email'   => $request->owner_email,
-
-            'manager_name'        => $request->manager_name,
-            'manager_number'      => $request->manager_number,
-            'manager_designation' => $request->manager_designation,
-            'manager_email'       => $request->manager_email,
-
-            'gstin'               => $request->gstin,
-            'gst_certificate'     => $gstPath,
-            'bank_name'           => $request->bank_name,
-            'account_holder_name' => $request->account_holder_name,
-            'account_number'      => $request->account_number,
-            'ifsc_code'           => $request->ifsc_code,
-            'branch_name'         => $request->branch_name,
-            'cancelled_cheque'    => $chequePath,
-
-            'status' => VendorProperty::STATUS_PENDING,
-        ]);
-
-        // Fire admin notification
-        AdminNotification::fire(
-            'property',
-            'New Property Submitted',
-            Auth::guard('vendor')->user()->username . ' submitted "' . $request->hotel_name . '" for approval.',
-            url('admin/property-submissions/' . $property->id),
-            $property->id
-        );
 
         return redirect()->route('vendor.properties.index')
-            ->with('success', '✅ Property submitted for review! Admin will review and get back to you shortly.');
+            ->with('success', 'Property submitted for review. Admin will review it shortly.');
     }
 
     /**

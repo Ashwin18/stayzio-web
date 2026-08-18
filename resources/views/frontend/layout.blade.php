@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zxx"dir="{{ $currentLanguageInfo->direction == 1 ? 'rtl' : '' }}">
+<html lang="zxx" dir="{{ $currentLanguageInfo->direction == 1 ? 'rtl' : '' }}">
 
 <head>
   <meta charset="utf-8">
@@ -10,9 +10,7 @@
   <meta name="description" content="@yield('metaDescription')">
   <meta name="csrf-token" content="{{ csrf_token() }}" />
   <meta property="og:title" content="@yield('ogTitle')">
-  {{-- title --}}
   <title>@yield('pageHeading') {{ '| ' . $websiteInfo->website_title }}</title>
-  {{-- fav icon --}}
   <link rel="shortcut icon" type="image/png" href="{{ asset('assets/img/' . $websiteInfo->favicon) }}">
   <link rel="apple-touch-icon" href="{{ asset('assets/img/' . $websiteInfo->favicon) }}">
   @includeIf('frontend.partials.styles')
@@ -25,26 +23,19 @@
   @elseif ($basicInfo->theme_version == 3)
     @includeIf('frontend.partials.header.header-v3')
   @endif
-   @yield('content')
-  <div class="go-top"><i class="fal fa-angle-up"></i></div>
+
+  @yield('content')
+
   @include('frontend.partials.footer')
 
-  <!-- Go to Top -->
-  <div class="go-top"><i class="fal fa-angle-up"></i></div>
-  <!-- Go to Top -->
-
   @includeIf('frontend.partials.popups')
-  {{-- cookie alert --}}
+
   @if (!is_null($cookieAlertInfo) && $cookieAlertInfo->cookie_alert_status == 1)
     @include('cookie-consent::index')
   @endif
 
-  <!-- WhatsApp Chat Button -->
   <div id="WAButton" class="whatsapp-btn-1"></div>
-  <!-- WhatsApp Chat Button END-->
-
 
   @include('frontend.partials.scripts')
 </body>
-
 </html>

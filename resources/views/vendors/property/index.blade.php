@@ -6,19 +6,30 @@
 <style>
 .prop-card{background:var(--navy2,#fff);border:1px solid var(--border,#e8eaed);border-radius:14px;padding:20px;margin-bottom:12px;display:flex;align-items:flex-start;gap:16px;transition:.15s}
 .prop-card:hover{box-shadow:0 4px 16px rgba(0,0,0,.06)}
-.prop-icon{width:48px;height:48px;background:rgba(227,30,36,.08);border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.prop-icon i{font-size:22px;color:#e31e24}
+.prop-icon{width:48px;height:48px;background:rgba(0,184,184,.10);border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.prop-icon i{font-size:22px;color:#00A6A6}
 .prop-info{flex:1;min-width:0}
 .prop-name{font-size:15px;font-weight:800;color:var(--text,#0c0c0e);margin-bottom:3px}
 .prop-meta{font-size:11px;color:var(--muted,#64748b);display:flex;flex-wrap:wrap;gap:10px;margin-bottom:8px}
 .prop-meta span{display:flex;align-items:center;gap:4px}
 .prop-prices{display:flex;gap:8px;flex-wrap:wrap}
 .prop-price{padding:4px 10px;background:var(--navy3,#f8fafc);border:1px solid var(--border,#e8eaed);border-radius:6px;font-size:11px}
-.prop-price strong{color:#e31e24;font-weight:800}
+.prop-price strong{color:#00A6A6;font-weight:800}
 .prop-badge{padding:4px 12px;border-radius:20px;font-size:10px;font-weight:700;flex-shrink:0}
 .prop-actions{display:flex;gap:6px;flex-shrink:0;align-items:center}
 .empty-state{text-align:center;padding:60px 20px;color:var(--muted,#64748b)}
 .empty-state i{font-size:48px;display:block;margin-bottom:14px;opacity:.3}
+
+@media(max-width:768px){
+  .prop-card{display:grid;grid-template-columns:auto 1fr;gap:12px;padding:16px}
+  .prop-actions{grid-column:1 / -1;width:100%;justify-content:flex-end;flex-wrap:wrap}
+  .prop-price{flex:1 1 calc(33.333% - 8px);text-align:center;min-width:90px}
+}
+@media(max-width:480px){
+  .prop-card{grid-template-columns:1fr}
+  .prop-icon{display:none}
+  .prop-actions{grid-column:1}
+}
 </style>
 
 <div class="page-hdr">

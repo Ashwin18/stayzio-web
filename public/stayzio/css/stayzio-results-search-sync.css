@@ -1,0 +1,287 @@
+
+/*
+|--------------------------------------------------------------------------
+| StayZio Results Search Sync Fix
+|--------------------------------------------------------------------------
+| Makes /rooms search match the Home search model and fixes:
+| - "Check-in Time" appearing twice visually
+| - invalid 12-hour value inside HTML time input
+| - congested search controls
+| - result search preserving Home selections
+|--------------------------------------------------------------------------
+*/
+
+:root{
+  --sz-navy:#0B1F3A;
+  --sz-teal:#00B8B8;
+  --sz-teal-dark:#009A9A;
+  --sz-teal-soft:#E8FBFB;
+  --sz-border:#E5EBF1;
+  --sz-muted:#91A0B2;
+}
+
+/* Header */
+body .sz-results-header .topbar-inner{
+  width:100% !important;
+  max-width:1480px !important;
+  height:78px !important;
+  margin:0 auto !important;
+  padding:0 22px !important;
+  display:grid !important;
+  grid-template-columns:180px minmax(650px,1fr) auto !important;
+  align-items:center !important;
+  gap:16px !important;
+}
+
+body .sz-results-header .stayzio-main-brand{
+  width:180px !important;
+  min-width:180px !important;
+  max-width:180px !important;
+}
+
+body .sz-results-header .stayzio-brand-logo{
+  width:170px !important;
+  max-width:170px !important;
+  height:50px !important;
+  object-fit:contain !important;
+  object-position:left center !important;
+}
+
+/* Search bar follows same field order as Home:
+   Location | Date | Time | Duration | Search */
+body .sz-results-search{
+  width:100% !important;
+  max-width:none !important;
+  min-width:0 !important;
+  height:54px !important;
+  display:grid !important;
+  grid-template-columns:
+    minmax(180px,1.25fr)
+    minmax(150px,1fr)
+    minmax(145px,.95fr)
+    minmax(140px,.9fr)
+    112px !important;
+  align-items:stretch !important;
+  gap:0 !important;
+  padding:4px !important;
+  margin:0 !important;
+  background:#F7F9FB !important;
+  border:1px solid #E3E9EF !important;
+  border-radius:16px !important;
+  overflow:hidden !important;
+  box-shadow:none !important;
+}
+
+body .sz-results-search:focus-within{
+  border-color:rgba(0,184,184,.45) !important;
+  box-shadow:0 0 0 3px rgba(0,184,184,.08) !important;
+}
+
+body .sz-results-search .ss-field{
+  width:100% !important;
+  min-width:0 !important;
+  height:46px !important;
+  padding:6px 14px !important;
+  display:flex !important;
+  align-items:center !important;
+  border-right:1px solid #E3E9EF !important;
+  overflow:hidden !important;
+}
+
+body .sz-results-search .ss-field-text{
+  width:100% !important;
+  min-width:0 !important;
+  display:flex !important;
+  flex-direction:column !important;
+  justify-content:center !important;
+}
+
+body .sz-results-search .ss-field-text small{
+  display:block !important;
+  color:var(--sz-muted) !important;
+  font-size:9px !important;
+  line-height:1 !important;
+  font-weight:800 !important;
+  letter-spacing:.055em !important;
+  text-transform:uppercase !important;
+  margin:0 0 5px !important;
+  white-space:nowrap !important;
+}
+
+/* Remove previous extra field icons so Check-in Time appears only once.
+   Native date/time pickers retain their own browser picker icon. */
+body .sz-results-search .ss-field > i{
+  display:none !important;
+}
+
+/* Clean native controls */
+body .sz-results-search select,
+body .sz-results-search input[type="date"],
+body .sz-results-search input[type="time"]{
+  width:100% !important;
+  min-width:0 !important;
+  height:20px !important;
+  padding:0 !important;
+  margin:0 !important;
+  border:0 !important;
+  outline:0 !important;
+  background:transparent !important;
+  color:var(--sz-navy) !important;
+  font-family:'Poppins',sans-serif !important;
+  font-size:11.5px !important;
+  line-height:20px !important;
+  font-weight:700 !important;
+}
+
+/* Prevent native control from looking like a second text field */
+body .sz-results-search input[type="time"]{
+  appearance:auto !important;
+  -webkit-appearance:auto !important;
+}
+
+/* Duration same Teal segmented style as Home */
+body .sz-results-search .ss-duration-pills{
+  width:100% !important;
+  height:27px !important;
+  display:grid !important;
+  grid-template-columns:repeat(3,1fr) !important;
+  gap:2px !important;
+  padding:2px !important;
+  background:#ECEFF2 !important;
+  border-radius:8px !important;
+}
+
+body .sz-results-search .ss-pill{
+  position:relative !important;
+  min-width:0 !important;
+  display:block !important;
+  cursor:pointer !important;
+}
+
+body .sz-results-search .ss-pill input{
+  position:absolute !important;
+  opacity:0 !important;
+  inset:0 !important;
+  width:100% !important;
+  height:100% !important;
+  cursor:pointer !important;
+}
+
+body .sz-results-search .ss-pill span{
+  height:23px !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  border-radius:6px !important;
+  background:transparent !important;
+  color:#778391 !important;
+  font-size:10px !important;
+  font-weight:800 !important;
+}
+
+body .sz-results-search .ss-pill input:checked + span{
+  background:var(--sz-teal) !important;
+  color:#fff !important;
+  box-shadow:0 2px 6px rgba(0,184,184,.20) !important;
+}
+
+/* Search CTA */
+body .sz-results-search .ss-search-btn{
+  width:100% !important;
+  height:46px !important;
+  min-width:0 !important;
+  margin:0 !important;
+  padding:0 12px !important;
+  border:0 !important;
+  border-radius:12px !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  gap:7px !important;
+  background:var(--sz-teal) !important;
+  color:#fff !important;
+  font-size:12px !important;
+  font-weight:800 !important;
+  white-space:nowrap !important;
+  box-shadow:0 5px 14px rgba(0,184,184,.18) !important;
+}
+
+body .sz-results-search .ss-search-btn:hover{
+  background:var(--sz-teal-dark) !important;
+}
+
+/* Right nav */
+body .sz-results-header .topbar-right{
+  display:flex !important;
+  align-items:center !important;
+  gap:2px !important;
+  min-width:max-content !important;
+}
+
+body .sz-results-header .topbar-right .t-link{
+  min-height:36px !important;
+  padding:0 8px !important;
+  display:inline-flex !important;
+  align-items:center !important;
+  font-size:11px !important;
+  white-space:nowrap !important;
+}
+
+/* Tablet */
+@media(max-width:1320px){
+  body .sz-results-header .topbar-inner{
+    grid-template-columns:155px minmax(590px,1fr) auto !important;
+    padding:0 14px !important;
+    gap:10px !important;
+  }
+
+  body .sz-results-header .stayzio-main-brand{
+    width:155px !important;
+    min-width:155px !important;
+    max-width:155px !important;
+  }
+
+  body .sz-results-header .stayzio-brand-logo{
+    width:148px !important;
+    max-width:148px !important;
+  }
+
+  body .sz-results-search{
+    grid-template-columns:
+      minmax(155px,1.2fr)
+      minmax(130px,1fr)
+      minmax(125px,.95fr)
+      130px
+      98px !important;
+  }
+
+  body .sz-results-header .results-top-link{
+    display:none !important;
+  }
+}
+
+/* Mobile keeps current hamburger/menu. Desktop search is intentionally hidden. */
+@media(max-width:1050px){
+  body .sz-results-header .topbar-inner{
+    display:flex !important;
+    height:66px !important;
+    justify-content:flex-start !important;
+  }
+
+  body .sz-results-header .sz-results-search,
+  body .sz-results-header .topbar-right{
+    display:none !important;
+  }
+
+  body .sz-results-header .stayzio-main-brand{
+    width:auto !important;
+    min-width:0 !important;
+    max-width:none !important;
+  }
+
+  body .sz-results-header .stayzio-brand-logo{
+    width:155px !important;
+    max-width:155px !important;
+    height:44px !important;
+  }
+}

@@ -1,0 +1,187 @@
+
+/*
+|--------------------------------------------------------------------------
+| StayZio Home Page - Remove Remaining Old Pink/Red Theme
+|--------------------------------------------------------------------------
+| Targets the current homepage sections shown in the screenshot:
+| hero/search band, Top Cities, Nearby Hotels and related controls.
+| Layout/functionality are not changed.
+*/
+
+:root{
+  --sz-navy:#0B1F3A;
+  --sz-teal:#00B8B8;
+  --sz-teal-dark:#009A9A;
+  --sz-teal-soft:#E8FBFB;
+  --sz-bg:#F7FAFC;
+  --sz-text:#2D3748;
+  --sz-muted:#64748B;
+  --sz-border:#E5EBF1;
+}
+
+/* Remove the old global pink page tint from index-v1 */
+body{
+  background:#FFFFFF !important;
+}
+
+/* Hero + search + Top Cities band */
+.sz-hero-band{
+  background:linear-gradient(180deg,#FFFFFF 0%,#F7FAFC 100%) !important;
+}
+
+/* Navy hero overlay */
+.sz-hero-overlay{
+  background:linear-gradient(
+    90deg,
+    rgba(11,31,58,.94) 0%,
+    rgba(11,31,58,.80) 41%,
+    rgba(11,31,58,.28) 70%,
+    rgba(11,31,58,.10) 100%
+  ) !important;
+}
+
+.sz-hero-txt h1 span{
+  color:#B9F3F3 !important;
+}
+
+/* Search card shadow was still using burgundy */
+.sz-search-inner{
+  box-shadow:
+    0 20px 50px -14px rgba(11,31,58,.22),
+    0 4px 14px rgba(11,31,58,.06) !important;
+  border:1px solid rgba(11,31,58,.07) !important;
+}
+
+.sz-search-inner .search-btn{
+  background:var(--sz-teal) !important;
+  box-shadow:0 8px 20px -6px rgba(0,184,184,.35) !important;
+}
+
+.sz-search-inner .search-btn:hover{
+  background:var(--sz-teal-dark) !important;
+}
+
+/* Dropdown/Time selector hover */
+.time-opt:hover,
+.dropdown-list li:hover{
+  background:var(--sz-teal-soft) !important;
+  color:var(--sz-teal-dark) !important;
+}
+
+.time-toggle button.active,
+.duration-tabs button.active{
+  background:var(--sz-teal) !important;
+  color:#fff !important;
+}
+
+/* Top Cities */
+.top-cities-section{
+  background:transparent !important;
+}
+
+.top-cities-section h3{
+  color:var(--sz-navy) !important;
+}
+
+.top-cities-section > p,
+.city-chip{
+  color:var(--sz-text) !important;
+}
+
+.city-chip .city-chip-badge{
+  background:linear-gradient(135deg,#66DADA,var(--sz-teal)) !important;
+  box-shadow:0 10px 22px rgba(0,184,184,.20) !important;
+}
+
+.city-chip:hover .city-chip-badge{
+  box-shadow:0 12px 28px rgba(0,184,184,.28) !important;
+}
+
+.all-cities i{
+  background:var(--sz-teal) !important;
+  box-shadow:0 10px 22px rgba(0,184,184,.18) !important;
+}
+
+/* Nearby hotels section - remove inherited pink/red background */
+.nearby-hotels-section,
+.nearby-hotels,
+.nearby-section,
+.nearby-wrapper,
+.sz-nearby-section{
+  background:#FFFFFF !important;
+}
+
+/* Headings and supporting text */
+.nearby-hotels-section h2,
+.nearby-hotels h2,
+.nearby-section h2,
+.sz-nearby-section h2{
+  color:var(--sz-navy) !important;
+}
+
+.nearby-hotels-section p,
+.nearby-hotels p,
+.nearby-section p,
+.sz-nearby-section p{
+  color:var(--sz-muted) !important;
+}
+
+/* Nearby controls / pills / links */
+.nearby-hotels-section a,
+.nearby-hotels a,
+.nearby-section a,
+.sz-nearby-section a,
+.view-all-nearby{
+  color:var(--sz-teal-dark) !important;
+}
+
+.nearby-hotels-section button,
+.nearby-hotels button,
+.nearby-section button,
+.sz-nearby-section button,
+.location-btn,
+.nearby-filter-btn{
+  border-color:var(--sz-teal) !important;
+  color:var(--sz-teal-dark) !important;
+  background:#FFFFFF !important;
+}
+
+.nearby-hotels-section button.active,
+.nearby-hotels button.active,
+.nearby-section button.active,
+.sz-nearby-section button.active,
+.location-btn.active,
+.nearby-filter-btn.active{
+  background:var(--sz-teal) !important;
+  border-color:var(--sz-teal) !important;
+  color:#FFFFFF !important;
+}
+
+/* Generic homepage pink/red remnants */
+.sz-hero-band [style*="#fdf3f7"],
+.sz-hero-band [style*="#fff1f8"],
+.sz-hero-band [style*="#fff1f1"]{
+  background:#F7FAFC !important;
+}
+
+.sz-hero-band [style*="#b00835"],
+.sz-hero-band [style*="#d81344"],
+.sz-hero-band [style*="#c41246"],
+.sz-hero-band [style*="#a10f39"]{
+  color:var(--sz-teal-dark) !important;
+  border-color:var(--sz-teal) !important;
+}
+
+/* Keep cards clean and neutral */
+.hotel-card,
+.nearby-card,
+.city-card{
+  border-color:var(--sz-border) !important;
+}
+
+/* Mobile */
+@media(max-width:768px){
+  .sz-hero-band{
+    background:#FFFFFF !important;
+  }
+}

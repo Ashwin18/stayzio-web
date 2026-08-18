@@ -481,7 +481,7 @@ body{background:#fdf3f7;}
                 
             @endphp
 
-            <div class="card" onclick="window.location.href='{{ route('frontend.hotel.details', ['slug' => $room->hotelSlug, 'id' => $room->hotelId]) }}'">
+            <div class="card" data-detail-url="{{ route('frontend.hotel.details', ['slug' => $room->hotelSlug, 'id' => $room->hotelId]) }}" onclick="szOpenNearbyHotel(this)">
                 <div class="card-img">
                     <img src="{{ asset('assets/img/room/featureImage/' . $room->feature_image) }}" alt="{{ $room->title }}">
                 </div>
@@ -509,7 +509,7 @@ body{background:#fdf3f7;}
                                 <div class="durations">
                                     @foreach ($nearbyPrices as $index => $price)
                                         <span class="dur {{ $index == 0 ? 'active' : '' }}"
-                                              data-price="{{ $price->price }}"
+                                              data-price="{{ $price->price }}" data-hour="{{ $price->hour }}"
                                               onclick="event.stopPropagation(); selectRoomPrice(this)">
                                         {{ $price->hour == 24 ? 'FULLDAY' : $price->hour . 'H' }}
                                         </span>
@@ -528,7 +528,7 @@ body{background:#fdf3f7;}
                                 </div>
                             @endif
                         </div>
-                        <button class="book-btn" type="button">Book Now</button>
+                        <button class="book-btn" type="button" onclick="event.stopPropagation(); szOpenNearbyHotel(this.closest('.card'))">Book Now</button>
                     </div>
                 </div>
             </div>
@@ -641,7 +641,7 @@ body{background:#fdf3f7;}
     
             @endphp
 
-            <div class="card" onclick="window.location.href='{{ route('frontend.hotel.details', ['slug' => $room->hotelSlug, 'id' => $room->hotelId]) }}'">
+            <div class="card" data-detail-url="{{ route('frontend.hotel.details', ['slug' => $room->hotelSlug, 'id' => $room->hotelId]) }}" onclick="szOpenNearbyHotel(this)">
                 <div class="card-img">
                     <img src="{{ asset('assets/img/room/featureImage/' . $room->feature_image) }}" alt="{{ $room->title }}">
                 </div>
@@ -671,7 +671,7 @@ body{background:#fdf3f7;}
                                 <div class="durations2">
                                     @foreach ($prices as $index => $price)
                                         <span class="dur {{ $index == 0 ? 'active' : '' }}"
-                                              data-price="{{ $price->price }}"
+                                              data-price="{{ $price->price }}" data-hour="{{ $price->hour }}"
                                               onclick="event.stopPropagation(); selectRoomPrice(this)">
                                             {{ $price->hour == 24 ? 'FULLDAY' : $price->hour . 'H' }}
                                         </span>
@@ -689,7 +689,7 @@ body{background:#fdf3f7;}
                                 </div>
                             @endif
                         </div>
-                        <button class="book-btn2" type="button">Book Now</button>
+                        <button class="book-btn2" type="button" onclick="event.stopPropagation(); szOpenNearbyHotel(this.closest('.card'))">Book Now</button>
                     </div>
                 </div>
             </div>
@@ -983,7 +983,7 @@ function renderNearbyCards(rooms) {
             room.prices.forEach((price, idx) => {
                 let activeClass = idx === 0 ? 'active' : '';
                 let label = parseInt(price.hour) === 24 ? 'FULLDAY' : price.hour + 'H';
-                durationSpanBlock += `<span class="dur ${activeClass}" data-price="${price.price}" onclick="event.stopPropagation(); selectRoomPrice(this)">${label}</span>`;
+                durationSpanBlock += `<span class="dur ${activeClass}" data-price="${price.price}" data-hour="${price.hour}" onclick="event.stopPropagation(); selectRoomPrice(this)">${label}</span>`;
             });
             durationSpanBlock += `</div>`;
         }
@@ -999,7 +999,7 @@ function renderNearbyCards(rooms) {
         }
 
         let cardHtml = `
-            <div class="card" onclick="window.location.href='${room.detail_url}'">
+            <div class="card" data-detail-url="${room.detail_url}" onclick="szOpenNearbyHotel(this)">
                 <div class="card-img">
                     <img src="${room.image_url}" alt="${room.title}">
                 </div>
@@ -1024,7 +1024,7 @@ function renderNearbyCards(rooms) {
                             ${durationSpanBlock}
                             ${priceBlock}
                         </div>
-                        <button class="book-btn" type="button">Book Now</button>
+                        <button class="book-btn" type="button" onclick="event.stopPropagation(); szOpenNearbyHotel(this.closest('.card'))">Book Now</button>
                     </div>
                 </div>
             </div>`;
@@ -1057,19 +1057,65 @@ function selectRoomPrice(element) {
     }
 
     element.classList.add('active');
-    
+
     const container = element.closest('.card');
     const price = parseFloat(element.dataset.price || 0);
 
-    const priceEl = container.querySelector('.dynamic-room-price');
+    if (container) {
+        let selectedHour = element.dataset.hour || '';
+        if (!selectedHour) {
+            const raw = element.textContent.trim().toUpperCase();
+            selectedHour = raw.includes('FULL') ? '24' : raw.replace(/[^0-9]/g, '');
+        }
+        container.dataset.selectedHour = selectedHour || '3';
+    }
+
+    const priceEl = container?.querySelector('.dynamic-room-price');
     if (priceEl) {
         priceEl.textContent = currencySymbol + formatRoomPrice(price);
     }
 
-    const labelEl = container.querySelector('.dynamic-room-label');
+    const labelEl = container?.querySelector('.dynamic-room-label');
     if (labelEl) {
-        labelEl.textContent = '/ ' + element.textContent.trim().toLowerCase().replace('h', ' hrs');
+        const h = container?.dataset.selectedHour || '';
+        labelEl.textContent = h === '24' ? '/ FULLDAY' : '/ ' + h + ' hrs';
     }
+}
+
+function szTodayYmd() {
+    const d = new Date();
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
+}
+
+function szOpenNearbyHotel(card) {
+    if (!card) return;
+
+    const detailUrl = card.dataset.detailUrl;
+    if (!detailUrl) return;
+
+    const activeDuration = card.querySelector('.dur.active');
+    let hour = card.dataset.selectedHour || activeDuration?.dataset?.hour || '';
+
+    if (!hour && activeDuration) {
+        const raw = activeDuration.textContent.trim().toUpperCase();
+        hour = raw.includes('FULL') ? '24' : raw.replace(/[^0-9]/g, '');
+    }
+    if (!hour) hour = '3';
+
+    const selectedTime = document.querySelector('.selected-time')?.textContent
+        ?.trim()
+        ?.replace(/[▼›⌄]/g, '')
+        ?.trim() || '';
+
+    const params = new URLSearchParams();
+    params.set('date_range', szTodayYmd());
+    params.set('hour', hour);
+    if (selectedTime) params.set('check_time', selectedTime);
+
+    window.location.href = detailUrl + (detailUrl.includes('?') ? '&' : '?') + params.toString();
 }
 </script>
 
@@ -1143,7 +1189,51 @@ function szSetDuration(el) {
 }
 
 function submitHomeSearch() {
-  var date = document.getElementById('dateRangeDisplay')?.dataset?.date || '';
+  var dateDisplay = document.getElementById('dateRangeDisplay');
+  var date = dateDisplay?.dataset?.date || '';
+
+  // Fallback: convert visible date such as "6 Sept 26" to YYYY-MM-DD.
+  // This protects the search even if the calendar UI updates the text
+  // without updating data-date.
+  if (!date && dateDisplay) {
+    var rawDate = dateDisplay.textContent.trim()
+      .replace(/[▼›⌄]/g, '')
+      .trim();
+
+    var m = rawDate.match(/^(\d{1,2})\s+([A-Za-z]+)\s+(\d{2,4})$/);
+
+    if (m) {
+      var monthMap = {
+        jan:1, january:1,
+        feb:2, february:2,
+        mar:3, march:3,
+        apr:4, april:4,
+        may:5,
+        jun:6, june:6,
+        jul:7, july:7,
+        aug:8, august:8,
+        sep:9, sept:9, september:9,
+        oct:10, october:10,
+        nov:11, november:11,
+        dec:12, december:12
+      };
+
+      var day = parseInt(m[1], 10);
+      var month = monthMap[m[2].toLowerCase()];
+      var year = parseInt(m[3], 10);
+
+      if (year < 100) year += 2000;
+
+      if (month) {
+        date =
+          year + '-' +
+          String(month).padStart(2, '0') + '-' +
+          String(day).padStart(2, '0');
+
+        dateDisplay.dataset.date = date;
+      }
+    }
+  }
   var time = document.querySelector('.selected-time')?.textContent?.trim().replace(/[▼›⌄]/g,'').trim() || '';
 
   // If a specific property was selected from the autosuggest, go straight to its page

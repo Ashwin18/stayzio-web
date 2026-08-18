@@ -1,0 +1,533 @@
+
+/*
+|--------------------------------------------------------------------------
+| StayZio Final Footer + Mobile Filter Responsive Fix
+|--------------------------------------------------------------------------
+| Covers:
+| - Footer tiny square / teal strip artifact
+| - Footer mobile 2-column layout
+| - Hotel list mobile filter drawer
+| - Mobile sort / hotel cards / duration tabs
+| - StayZio Navy + Teal theme consistency
+|--------------------------------------------------------------------------
+*/
+
+:root{
+  --sz-navy:#0B1F3A;
+  --sz-teal:#00B8B8;
+  --sz-teal-dark:#009A9A;
+  --sz-teal-soft:#E8FBFB;
+  --sz-white:#FFFFFF;
+  --sz-text:#2D3748;
+  --sz-muted:#64748B;
+  --sz-border:#E5EBF1;
+}
+
+/* =========================================================
+   FOOTER - REMOVE SMALL SQUARE / DECORATIVE LINE ARTIFACT
+   ========================================================= */
+
+html body footer.stayzio-footer{
+  background:#0B1F3A !important;
+  background-color:#0B1F3A !important;
+  border:0 !important;
+  border-top:0 !important;
+  border-bottom:0 !important;
+  outline:0 !important;
+  box-shadow:none !important;
+  overflow:hidden !important;
+  position:relative !important;
+}
+
+/* Kill every old decorative pseudo-element that can create the
+   teal strip / small box seen at far-left. */
+html body footer.stayzio-footer::before,
+html body footer.stayzio-footer::after,
+html body footer.stayzio-footer .stayzio-footer-inner::before,
+html body footer.stayzio-footer .stayzio-footer-inner::after,
+html body footer.stayzio-footer .stayzio-footer-brand::before,
+html body footer.stayzio-footer .stayzio-footer-brand::after,
+html body footer.stayzio-footer .stayzio-footer-col::before,
+html body footer.stayzio-footer .stayzio-footer-col::after{
+  content:none !important;
+  display:none !important;
+  width:0 !important;
+  height:0 !important;
+  border:0 !important;
+  background:none !important;
+}
+
+/* Remove inherited line / divider classes inside footer */
+html body footer.stayzio-footer .line,
+html body footer.stayzio-footer .footer-line,
+html body footer.stayzio-footer .footer-border,
+html body footer.stayzio-footer .footer-divider,
+html body footer.stayzio-footer [class*="footer-line"],
+html body footer.stayzio-footer [class*="footer-border"]{
+  display:none !important;
+  border:0 !important;
+  background:none !important;
+}
+
+/* Keep footer clean: no teal top/bottom bars */
+html body footer.stayzio-footer{
+  padding:48px 0 34px !important;
+  margin:0 !important;
+}
+
+html body .stayzio-footer-inner{
+  width:min(1180px,calc(100% - 40px)) !important;
+  max-width:1180px !important;
+  margin:0 auto !important;
+  padding:0 !important;
+  display:grid !important;
+  grid-template-columns:1.6fr 1fr 1fr 1fr !important;
+  gap:44px !important;
+  align-items:start !important;
+}
+
+html body .stayzio-footer-logo img{
+  width:170px !important;
+  max-width:170px !important;
+  height:auto !important;
+  max-height:50px !important;
+  object-fit:contain !important;
+  object-position:left center !important;
+  filter:brightness(0) invert(1) !important;
+}
+
+html body .stayzio-footer-brand p{
+  color:rgba(255,255,255,.78) !important;
+  opacity:1 !important;
+  font-size:13px !important;
+  line-height:1.7 !important;
+}
+
+html body .stayzio-footer-col h5{
+  color:#fff !important;
+  opacity:1 !important;
+  font-size:12px !important;
+  font-weight:800 !important;
+  letter-spacing:.10em !important;
+  margin-bottom:15px !important;
+}
+
+html body .stayzio-footer-col a{
+  color:rgba(255,255,255,.78) !important;
+  opacity:1 !important;
+  font-size:13px !important;
+  margin-bottom:10px !important;
+}
+
+html body .stayzio-footer-col a:hover{
+  color:#66E3E3 !important;
+}
+
+html body .stayzio-socials{
+  display:flex !important;
+  flex-wrap:wrap !important;
+  gap:9px !important;
+}
+
+html body .stayzio-socials a{
+  width:34px !important;
+  height:34px !important;
+  border-radius:50% !important;
+  background:rgba(255,255,255,.08) !important;
+  border:1px solid rgba(255,255,255,.15) !important;
+  color:#fff !important;
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+}
+
+/* =========================================================
+   FOOTER TABLET
+   ========================================================= */
+@media (max-width:900px){
+  html body .stayzio-footer-inner{
+    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+    gap:30px 36px !important;
+  }
+}
+
+/* =========================================================
+   FOOTER MOBILE - TWO COLUMNS SIDE BY SIDE
+   ========================================================= */
+@media (max-width:600px){
+
+  html body footer.stayzio-footer{
+    padding:34px 0 28px !important;
+  }
+
+  html body .stayzio-footer-inner{
+    width:calc(100% - 30px) !important;
+    max-width:none !important;
+    margin:0 auto !important;
+    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+    gap:28px 20px !important;
+    align-items:start !important;
+  }
+
+  /* Two-column mobile layout:
+     row 1 = Brand | Quick Links
+     row 2 = Company | Support */
+  html body .stayzio-footer-brand,
+  html body .stayzio-footer-col{
+    grid-column:auto !important;
+    min-width:0 !important;
+  }
+
+  html body .stayzio-footer-logo img{
+    width:132px !important;
+    max-width:100% !important;
+    max-height:42px !important;
+  }
+
+  html body .stayzio-footer-brand p{
+    font-size:11px !important;
+    line-height:1.6 !important;
+    margin-bottom:14px !important;
+  }
+
+  html body .stayzio-footer-col h5{
+    font-size:10px !important;
+    margin-bottom:12px !important;
+    letter-spacing:.08em !important;
+  }
+
+  html body .stayzio-footer-col a{
+    font-size:11px !important;
+    line-height:1.45 !important;
+    margin-bottom:8px !important;
+    word-break:normal !important;
+  }
+
+  html body .stayzio-socials{
+    gap:6px !important;
+  }
+
+  html body .stayzio-socials a{
+    width:29px !important;
+    height:29px !important;
+    font-size:11px !important;
+  }
+}
+
+/* Very small phones: still keep 2 columns, reduce spacing */
+@media (max-width:380px){
+  html body .stayzio-footer-inner{
+    width:calc(100% - 22px) !important;
+    gap:22px 14px !important;
+  }
+
+  html body .stayzio-footer-logo img{
+    width:112px !important;
+  }
+
+  html body .stayzio-footer-col a{
+    font-size:10.5px !important;
+  }
+}
+
+
+/* =========================================================
+   HOTEL LIST MOBILE RESPONSIVE
+   ========================================================= */
+
+@media (max-width:768px){
+
+  /* Listing page content */
+  body .main-layout{
+    display:block !important;
+    width:100% !important;
+    max-width:100% !important;
+    padding:12px !important;
+    margin:0 !important;
+  }
+
+  body .results-panel{
+    width:100% !important;
+    max-width:100% !important;
+    padding:0 !important;
+    margin:0 !important;
+  }
+
+  /* Mobile Filters button should always be visible */
+  body .mobile-filter-btn{
+    display:inline-flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+    gap:7px !important;
+    min-height:40px !important;
+    padding:8px 14px !important;
+    margin:0 !important;
+    border:1px solid var(--sz-teal) !important;
+    border-radius:10px !important;
+    background:#fff !important;
+    color:var(--sz-teal-dark) !important;
+    font-size:12px !important;
+    font-weight:800 !important;
+    box-shadow:none !important;
+  }
+
+  body .mobile-filter-btn i{
+    color:var(--sz-teal) !important;
+  }
+
+  /* Sidebar filter drawer supports BOTH class names used by
+     current/legacy JS: .open and .mobile-open */
+  body .sidebar{
+    display:block !important;
+    position:fixed !important;
+    top:0 !important;
+    left:-100% !important;
+    width:min(86vw,330px) !important;
+    max-width:330px !important;
+    height:100dvh !important;
+    min-height:100vh !important;
+    padding-top:54px !important;
+    overflow-y:auto !important;
+    background:#fff !important;
+    z-index:10050 !important;
+    border-radius:0 18px 18px 0 !important;
+    border:0 !important;
+    box-shadow:8px 0 32px rgba(11,31,58,.20) !important;
+    transition:left .25s ease !important;
+  }
+
+  body .sidebar.open,
+  body .sidebar.mobile-open{
+    left:0 !important;
+  }
+
+  body .sidebar .sidebar-header{
+    position:sticky !important;
+    top:0 !important;
+    z-index:3 !important;
+    background:#fff !important;
+    padding:15px 16px !important;
+  }
+
+  body .sidebar .filter-section{
+    padding:15px 16px !important;
+  }
+
+  body .sidebar .chip-group{
+    gap:7px !important;
+  }
+
+  body .sidebar .chip{
+    padding:6px 11px !important;
+    font-size:11px !important;
+  }
+
+  body .sidebar .chip.selected{
+    background:var(--sz-teal-soft) !important;
+    color:var(--sz-teal-dark) !important;
+    border-color:var(--sz-teal) !important;
+  }
+
+  /* Backdrop supports existing classes */
+  body .sidebar-backdrop{
+    display:none !important;
+    position:fixed !important;
+    inset:0 !important;
+    background:rgba(11,31,58,.48) !important;
+    z-index:10040 !important;
+    backdrop-filter:blur(2px) !important;
+  }
+
+  body .sidebar-backdrop.show,
+  body .sidebar-backdrop.open{
+    display:block !important;
+  }
+
+  /* Sort bar: Filter button + sorts cleanly arranged */
+  body .sort-bar{
+    width:100% !important;
+    padding:10px !important;
+    display:flex !important;
+    flex-direction:column !important;
+    align-items:stretch !important;
+    gap:9px !important;
+    border-radius:12px !important;
+  }
+
+  body .sort-left{
+    width:100% !important;
+    display:flex !important;
+    flex-wrap:wrap !important;
+    gap:6px !important;
+  }
+
+  body .sort-label{
+    width:100% !important;
+    font-size:11px !important;
+  }
+
+  body .sort-btn{
+    flex:0 0 auto !important;
+    min-height:34px !important;
+    padding:6px 11px !important;
+    font-size:11px !important;
+  }
+
+  body .sort-right{
+    width:100% !important;
+    justify-content:space-between !important;
+  }
+
+  /* Hotel cards full-width on mobile */
+  body .hotels-list{
+    gap:14px !important;
+  }
+
+  body .hotel-card{
+    width:100% !important;
+    max-width:100% !important;
+    display:block !important;
+    border-radius:14px !important;
+    overflow:hidden !important;
+  }
+
+  body .hotel-card .card-img-wrap{
+    width:100% !important;
+    min-height:0 !important;
+    height:205px !important;
+  }
+
+  body .hotel-card .card-img-wrap img,
+  body .hotel-card .card-img-wrap img.hotel-card-main-img{
+    width:100% !important;
+    height:205px !important;
+    object-fit:cover !important;
+    border-radius:0 !important;
+  }
+
+  body .hotel-card .card-body{
+    width:100% !important;
+    padding:14px !important;
+  }
+
+  body .hotel-card .card-top{
+    gap:8px !important;
+  }
+
+  body .hotel-card .card-name{
+    font-size:16px !important;
+  }
+
+  body .hotel-card .amenities{
+    gap:7px 10px !important;
+  }
+
+  body .hotel-card .amenity{
+    font-size:10.5px !important;
+  }
+
+  /* Duration cards 3H / 6H / Day stay side-by-side */
+  body .hotel-card .card-footer{
+    display:block !important;
+  }
+
+  body .hotel-card .duration-tabs{
+    width:100% !important;
+    display:grid !important;
+    grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+    gap:7px !important;
+    margin-bottom:12px !important;
+  }
+
+  body .hotel-card .dtab{
+    width:100% !important;
+    min-width:0 !important;
+    padding:7px 4px !important;
+    border:1px solid #DEE5EC !important;
+    border-radius:9px !important;
+    background:#fff !important;
+  }
+
+  body .hotel-card .dtab.active{
+    background:var(--sz-teal-soft) !important;
+    border-color:var(--sz-teal) !important;
+  }
+
+  body .hotel-card .dtab-label{
+    font-size:9px !important;
+  }
+
+  body .hotel-card .dtab-price{
+    font-size:13px !important;
+  }
+
+  body .hotel-card .dtab-sub{
+    font-size:8px !important;
+  }
+
+  /* Book + View Details as two buttons side-by-side */
+  body .hotel-card .book-actions{
+    width:100% !important;
+    display:grid !important;
+    grid-template-columns:1fr 1fr !important;
+    gap:8px !important;
+    align-items:stretch !important;
+  }
+
+  body .hotel-card .btn-book,
+  body .hotel-card .btn-view-more{
+    width:100% !important;
+    min-height:42px !important;
+    padding:8px 8px !important;
+    margin:0 !important;
+    text-align:center !important;
+    display:flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+    font-size:11px !important;
+  }
+
+  /* No desktop sticky top offset on mobile */
+  body .sidebar{
+    top:0 !important;
+  }
+}
+
+/* =========================================================
+   MOBILE TOPBAR / SEARCH
+   Hide crowded desktop inline search and use hamburger/menu.
+   ========================================================= */
+@media (max-width:1050px){
+  body .topbar-inner{
+    min-height:64px !important;
+    height:64px !important;
+    padding:0 14px !important;
+    display:flex !important;
+    align-items:center !important;
+    justify-content:space-between !important;
+  }
+
+  body .topbar .search-strip,
+  body .topbar-right{
+    display:none !important;
+  }
+
+  body .topbar .site-hamburger{
+    display:inline-flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+  }
+
+  body .topbar .stayzio-main-brand{
+    width:auto !important;
+    min-width:0 !important;
+    max-width:none !important;
+    flex:1 !important;
+  }
+
+  body .topbar .stayzio-brand-logo{
+    width:150px !important;
+    height:44px !important;
+    max-width:150px !important;
+  }
+}

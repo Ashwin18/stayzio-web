@@ -11,34 +11,34 @@
 .pf-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
 .pf-fg{margin-bottom:0}
 .pf-label{font-size:11px;font-weight:700;color:var(--muted,#64748b);text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:5px}
-.pf-label .req{color:#e31e24}
+.pf-label .req{color:#00B8B8}
 .pf-input{width:100%;padding:9px 12px;background:var(--navy3,#f8fafc);border:1.5px solid var(--border,#e8eaed);border-radius:8px;color:var(--text,#0c0c0e);font-size:13px;font-family:'Poppins',sans-serif;outline:none;transition:.15s}
-.pf-input:focus{border-color:#e31e24;background:#fff;color:#0c0c0e!important}
+.pf-input:focus{border-color:#00B8B8;background:#fff;color:#0c0c0e!important}
 .pf-input{color:#f1f5f9}
 .pf-input::placeholder{color:#64748b}
-.pf-price-input{color:#e31e24!important}
-.pf-price-input:focus{background:#fff;color:#e31e24!important}
+.pf-price-input{color:#00B8B8!important}
+.pf-price-input:focus{background:#fff;color:#00B8B8!important}
 select.pf-input{color:#f1f5f9}
 select.pf-input:focus{color:#0c0c0e!important}
 .pf-input::placeholder{color:var(--muted,#94a3b8)}
 textarea.pf-input{min-height:80px;resize:vertical}
 .pf-radio-group{display:flex;gap:10px;margin-top:4px}
 .pf-radio{display:flex;align-items:center;gap:6px;padding:8px 16px;border:1.5px solid var(--border,#e8eaed);border-radius:8px;cursor:pointer;font-size:12px;font-weight:600;color:var(--text,#0c0c0e);transition:.15s;background:var(--navy3,#f8fafc)}
-.pf-radio:has(input:checked){border-color:#e31e24;color:#e31e24;background:rgba(227,30,36,.05)}
-.pf-radio input{accent-color:#e31e24}
+.pf-radio:has(input:checked){border-color:#00B8B8;color:#00B8B8;background:rgba(0,184,184,.06)}
+.pf-radio input{accent-color:#00B8B8}
 .pf-check-group{display:flex;flex-wrap:wrap;gap:10px;margin-top:4px}
 .pf-check{display:flex;align-items:center;gap:7px;padding:8px 14px;border:1.5px solid var(--border,#e8eaed);border-radius:8px;cursor:pointer;font-size:12px;font-weight:600;transition:.15s;background:var(--navy3,#f8fafc)}
 .pf-check:has(input:checked){border-color:#059669;color:#059669;background:rgba(5,150,105,.05)}
 .pf-check input{accent-color:#059669}
 .pf-file-wrap{position:relative;display:inline-flex;align-items:center;gap:8px;padding:8px 16px;border:1.5px dashed var(--border,#e8eaed);border-radius:8px;cursor:pointer;font-size:12px;color:var(--muted,#64748b);transition:.15s;background:var(--navy3,#f8fafc)}
-.pf-file-wrap:hover{border-color:#e31e24;color:#e31e24}
+.pf-file-wrap:hover{border-color:#00B8B8;color:#00B8B8}
 .pf-file-wrap input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer}
 .pf-hint{font-size:10px;color:var(--muted,#94a3b8);margin-top:4px}
-.pf-price-card{background:rgba(227,30,36,.04);border:1.5px solid rgba(227,30,36,.15);border-radius:10px;padding:14px;text-align:center}
+.pf-price-card{background:rgba(0,184,184,.05);border:1.5px solid rgba(0,184,184,.18);border-radius:10px;padding:14px;text-align:center}
 .pf-price-label{font-size:10px;font-weight:700;color:var(--muted,#64748b);text-transform:uppercase;margin-bottom:6px}
-.pf-price-input{width:100%;padding:10px;background:#fff;border:1.5px solid var(--border,#e8eaed);border-radius:8px;font-size:16px;font-weight:700;color:#e31e24;text-align:center;font-family:'Poppins',sans-serif}
-.pf-price-input:focus{border-color:#e31e24;outline:none}
-.pf-step-num{width:28px;height:28px;background:#e31e24;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;flex-shrink:0}
+.pf-price-input{width:100%;padding:10px;background:#fff;border:1.5px solid var(--border,#e8eaed);border-radius:8px;font-size:16px;font-weight:700;color:#00B8B8;text-align:center;font-family:'Poppins',sans-serif}
+.pf-price-input:focus{border-color:#00B8B8;outline:none}
+.pf-step-num{width:28px;height:28px;background:#00B8B8;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;flex-shrink:0}
 
 .pf-file-preview{display:flex;align-items:center;gap:10px;padding:10px 14px;background:rgba(5,150,105,.06);border:1.5px solid rgba(5,150,105,.2);border-radius:8px}
 .pf-file-name{font-size:12px;font-weight:700;color:var(--text,#f1f5f9);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -48,15 +48,21 @@ textarea.pf-input{min-height:80px;resize:vertical}
 .pf-file-view:hover{background:rgba(37,99,235,.15)}
 .pf-file-delete{background:none;border:none;color:#dc2626;cursor:pointer;font-size:16px;padding:4px}
 .pf-file-delete:hover{color:#b91c1c}
-@media(max-width:768px){.pf-grid,.pf-grid-3{grid-template-columns:1fr}}
+@media(max-width:768px){
+.pf-grid,.pf-grid-3{grid-template-columns:1fr}
+.pf-fg[style*="grid-column:span 2"]{grid-column:span 1!important}
+.pf-radio-group{flex-wrap:wrap}
+.pf-submit-row{flex-direction:column}
+.pf-submit-row .btn{width:100%;justify-content:center}
+}
 
 /* Force dark text on all form inputs */
 .pf-input,.pf-input:focus,.pf-price-input,
 input[type="text"],input[type="number"],input[type="email"],input[type="tel"],
 textarea,select{color:#1a1612!important;background:#f8f6f1!important}
-input:focus,textarea:focus,select:focus{color:#1a1612!important;background:#fff!important;border-color:#e31e24!important}
+input:focus,textarea:focus,select:focus{color:#1a1612!important;background:#fff!important;border-color:#00B8B8!important}
 input::placeholder,textarea::placeholder{color:#94a3b8!important}
-.pf-price-input,.pf-price-input:focus{color:#e31e24!important;background:#fff!important}
+.pf-price-input,.pf-price-input:focus{color:#00B8B8!important;background:#fff!important}
 </style>
 
 <div class="page-hdr">
@@ -232,6 +238,14 @@ input::placeholder,textarea::placeholder{color:#94a3b8!important}
       <label class="pf-label">Owner / Manager Contact Number <span class="req">*</span></label>
       <input type="tel" name="owner_contact" class="pf-input" placeholder="9876543210" value="{{ old('owner_contact') }}" required pattern="[6-9][0-9]{9}" maxlength="10" minlength="10" oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,10)" title="Enter valid 10-digit mobile number starting with 6-9">
     </div>
+    <div class="pf-fg">
+      <label class="pf-label">Owner / Manager Email <span class="req">*</span></label>
+      <input type="email" name="owner_email" class="pf-input"
+             placeholder="owner@example.com"
+             value="{{ old('owner_email', optional(Auth::guard('vendor')->user())->email) }}"
+             maxlength="255" required>
+      <div class="pf-hint">Property approval and operational communication will be sent to this email.</div>
+    </div>
   </div>
 </div>
 
@@ -274,7 +288,7 @@ input::placeholder,textarea::placeholder{color:#94a3b8!important}
 
   <div style="border-top:1px solid var(--border,#e8eaed);margin:16px 0;padding-top:16px">
     <div style="font-size:12px;font-weight:700;color:var(--text,#0c0c0e);margin-bottom:12px">
-      <i class="ti ti-building-bank" style="color:#e31e24"></i> Bank Account Details
+      <i class="ti ti-building-bank" style="color:#00B8B8"></i> Bank Account Details
     </div>
     <div class="pf-grid">
       <div class="pf-fg">
@@ -327,7 +341,7 @@ input::placeholder,textarea::placeholder{color:#94a3b8!important}
 </div>
 
 {{-- Submit --}}
-<div style="display:flex;gap:10px;margin-top:8px;margin-bottom:32px">
+<div class="pf-submit-row" style="display:flex;gap:10px;margin-top:8px;margin-bottom:32px">
   <button type="submit" class="btn btn-primary" style="padding:12px 32px;font-size:14px">
     <i class="ti ti-send"></i> Submit for Review
   </button>
@@ -382,8 +396,7 @@ function removeFile(type) {
 document.querySelector("form").addEventListener("submit", function(e) {
   var phones = [
     {name: "mobile_number", label: "Mobile Number", req: true},
-    {name: "owner_contact", label: "Owner Contact", req: true},
-    {name: "manager_number", label: "Manager Number", req: false}
+    {name: "owner_contact", label: "Owner Contact", req: true}
   ];
   for (var i = 0; i < phones.length; i++) {
     var inp = document.querySelector("[name='" + phones[i].name + "']");

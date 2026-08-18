@@ -1,0 +1,186 @@
+
+/*
+|--------------------------------------------------------------------------
+| StayZio Vendor Signup Brand Theme
+|--------------------------------------------------------------------------
+| Layout and form logic stay unchanged.
+*/
+.list-hotel-page{
+  --sz-navy:#0B1F3A;
+  --sz-teal:#00B8B8;
+  --sz-teal-dark:#009A9A;
+  --sz-soft:#E8FBFB;
+  --sz-text:#2D3748;
+  --sz-line:#E5EBF1;
+  color:var(--sz-text) !important;
+}
+
+.list-hotel-page .lyh-hero{
+  background:
+    radial-gradient(circle at 88% 12%,rgba(0,184,184,.10),transparent 24%),
+    linear-gradient(180deg,#FFFFFF 0%,#F8FCFD 100%) !important;
+}
+
+.list-hotel-page .lyh-bg-shape{
+  background:rgba(0,184,184,.10) !important;
+}
+
+.list-hotel-page .lyh-eyebrow span{
+  color:var(--sz-teal-dark) !important;
+  background:#fff !important;
+  border-color:#BDEEEE !important;
+}
+
+.list-hotel-page .lyh-hero-copy h1,
+.list-hotel-page .lyh-title h2,
+.list-hotel-page .lyh-title-left h2,
+.list-hotel-page .lyh-form-head h3,
+.list-hotel-page .lyh-steps h3,
+.list-hotel-page .lyh-feature-grid h3{
+  color:var(--sz-navy) !important;
+}
+
+.list-hotel-page .lyh-hero-copy p,
+.list-hotel-page .lyh-title p,
+.list-hotel-page .lyh-feature-grid p,
+.list-hotel-page .lyh-steps p{
+  color:#64748B !important;
+}
+
+.list-hotel-page .lyh-benefits-row > div,
+.list-hotel-page .lyh-form-card,
+.list-hotel-page .lyh-steps > div,
+.list-hotel-page .lyh-feature-grid > div{
+  border-color:var(--sz-line) !important;
+  box-shadow:0 10px 28px rgba(11,31,58,.06) !important;
+}
+
+.list-hotel-page .lyh-benefits-row i,
+.list-hotel-page .lyh-form-head > span,
+.list-hotel-page .lyh-feature-grid i,
+.list-hotel-page .lyh-steps em{
+  background:var(--sz-teal) !important;
+  color:#fff !important;
+  border-color:var(--sz-teal) !important;
+}
+
+.list-hotel-page .lyh-title > span,
+.list-hotel-page .lyh-title-left > span{
+  color:var(--sz-teal-dark) !important;
+}
+
+.list-hotel-page .lyh-input,
+.list-hotel-page .lyh-field input{
+  border-color:#DDE5EC !important;
+}
+
+.list-hotel-page .lyh-input:focus,
+.list-hotel-page .lyh-field input:focus{
+  border-color:var(--sz-teal) !important;
+  box-shadow:0 0 0 3px rgba(0,184,184,.10) !important;
+  outline:none !important;
+}
+
+.list-hotel-page .lyh-submit{
+  background:var(--sz-teal) !important;
+  border-color:var(--sz-teal) !important;
+  color:#fff !important;
+  box-shadow:0 12px 26px rgba(0,184,184,.22) !important;
+}
+
+.list-hotel-page .lyh-submit:hover{
+  background:var(--sz-teal-dark) !important;
+}
+
+/* Inline legacy red in register/login tabs and links */
+.list-hotel-page [style*="#e31e24"],
+.list-hotel-page [style*="#E31E24"]{
+  color:var(--sz-teal-dark) !important;
+  border-color:var(--sz-teal) !important;
+}
+
+.list-hotel-page #tab-register{
+  color:var(--sz-teal-dark) !important;
+  border-bottom-color:var(--sz-teal) !important;
+}
+
+.list-hotel-page #tab-login[style*="color:#e31e24"]{
+  color:var(--sz-teal-dark) !important;
+}
+
+.list-hotel-page .lyh-suggestion-item:hover{
+  background:var(--sz-soft) !important;
+}
+
+/* Stats band */
+.list-hotel-page .lyh-stats{
+  background:var(--sz-navy) !important;
+  color:#fff !important;
+}
+
+.list-hotel-page .lyh-stats strong,
+.list-hotel-page .lyh-stats span{
+  color:#fff !important;
+}
+
+/* FAQ */
+.list-hotel-page .lyh-faq button,
+.list-hotel-page .lyh-faq-item,
+.list-hotel-page details{
+  border-color:var(--sz-line) !important;
+}
+
+.list-hotel-page .lyh-faq i,
+.list-hotel-page .lyh-faq button i{
+  color:var(--sz-teal) !important;
+}
+
+/* CTA */
+.list-hotel-page .lyh-cta,
+.list-hotel-page .lyh-final-cta{
+  background:linear-gradient(120deg,var(--sz-navy),#143A63) !important;
+  color:#fff !important;
+}
+
+.list-hotel-page .lyh-cta h2,
+.list-hotel-page .lyh-cta h3,
+.list-hotel-page .lyh-final-cta h2,
+.list-hotel-page .lyh-final-cta h3{
+  color:#fff !important;
+}
+
+.list-hotel-page .lyh-cta a,
+.list-hotel-page .lyh-final-cta a{
+  background:var(--sz-teal) !important;
+  border-color:var(--sz-teal) !important;
+  color:#fff !important;
+}
+
+/* Shared header on vendor signup */
+body .navbar-section{
+  background:#fff !important;
+}
+
+body .navbar-section .stayzio-brand-text{
+  display:none !important;
+}
+
+body .navbar-section .stayzio-brand-logo{
+  width:165px !important;
+  max-width:165px !important;
+  height:50px !important;
+  object-fit:contain !important;
+}
+
+body .navbar-section .btn-rounded:hover{
+  background:#00B8B8 !important;
+  border-color:#00B8B8 !important;
+  color:#fff !important;
+}
+
+@media(max-width:768px){
+  body .navbar-section .stayzio-brand-logo{
+    width:145px !important;
+    height:44px !important;
+  }
+}

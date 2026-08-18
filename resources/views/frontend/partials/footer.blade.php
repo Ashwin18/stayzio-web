@@ -1,16 +1,17 @@
 <footer class="stayzio-footer">
     <div class="stayzio-footer-inner">
         <div class="stayzio-footer-brand">
-            <a href="index.php" class="stayzio-footer-logo" aria-label="StayZio Home">
+            <a href="{{ route('index') }}" class="stayzio-footer-logo" aria-label="StayZio Home">
                 <img src="{{ asset('stayzio/images/stayzio-logo.png') }}" alt="StayZio Logo">
-                <span>Stay<span>Zio</span></span>
             </a>
+
             <p>Hotels made simple with flexible short-stay booking for the modern traveler.</p>
+
             <div class="stayzio-socials" aria-label="Social links">
-                <a href="#" aria-label="Facebook">f</a>
-                <a href="#" aria-label="LinkedIn">in</a>
-                <a href="#" aria-label="Instagram">ig</a>
-                <a href="#" aria-label="X">x</a>
+                <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                <a href="#" aria-label="X"><i class="fab fa-x-twitter"></i></a>
             </div>
         </div>
 
@@ -26,7 +27,7 @@
         <div class="stayzio-footer-col">
             <h5>Company</h5>
             <a href="#">Contact</a>
-            <a href="#">Partner With Us</a>
+            <a href="{{ route('vendor.signup') }}">Partner With Us</a>
             <a href="#">About Us</a>
             <a href="#">Careers</a>
         </div>
@@ -40,4 +41,5 @@
         </div>
     </div>
 </footer>
+
 <div id="toast-message" style="display:none;"></div>

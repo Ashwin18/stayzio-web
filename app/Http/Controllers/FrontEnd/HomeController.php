@@ -26,7 +26,6 @@ class HomeController extends Controller
 {
   public function index(Request $request)
   {
-   
     $themeVersion = Basic::query()->pluck('theme_version')->first();
 
     $secInfo = Section::query()->first();
@@ -42,13 +41,14 @@ class HomeController extends Controller
     if ($themeVersion == 1 || $themeVersion == 2) {
       $information['sliderInfos'] = $language->sliderInfo()->orderByDesc('id')->get();
     }
+
     if ($themeVersion == 3 && $secInfo->benifit_section_status == 1) {
-      $information['benifits'] =  $language->benifits()->orderByDesc('id')->get();
+      $information['benifits'] = $language->benifits()->orderByDesc('id')->get();
     }
 
     $information['sectionContent'] = SectionContent::where('language_id', $language->id)->first();
 
-    $information['images']  = Basic::select(
+    $information['images'] = Basic::select(
       'hero_section_image',
       'feature_section_image',
       'counter_section_image',
@@ -57,12 +57,9 @@ class HomeController extends Controller
       'testimonial_section_image'
     )->first();
 
-
-
     if ($secInfo->featured_section_status == 1) {
       $information['features'] = Feature::where('language_id', $language->id)->get();
     }
-
 
     if ($themeVersion == 1) {
       $information['banners'] = Banner::where('language_id', $language->id)->get();
@@ -72,7 +69,6 @@ class HomeController extends Controller
       $information['workProcessSecInfo'] = $language->workProcessSection()->first();
       $information['processes'] = $language->workProcess()->orderBy('serial_number', 'asc')->get();
     }
-
 
     if ($secInfo->counter_section_status == 1) {
       $information['counters'] = $language->counterInfo()->orderByDesc('id')->get();
@@ -85,7 +81,6 @@ class HomeController extends Controller
     }
 
     if ($secInfo->blog_section_status == 1) {
-
       $information['blogs'] = Blog::query()->join('blog_informations', 'blogs.id', '=', 'blog_informations.blog_id')
         ->join('blog_categories', 'blog_categories.id', '=', 'blog_informations.blog_category_id')
         ->where('blogs.status', '=', 1)
@@ -96,7 +91,7 @@ class HomeController extends Controller
         ->limit(3)
         ->get();
 
-      $information['blog_count']  = Blog::query()->join('blog_informations', 'blogs.id', '=', 'blog_informations.blog_id')
+      $information['blog_count'] = Blog::query()->join('blog_informations', 'blogs.id', '=', 'blog_informations.blog_id')
         ->join('blog_categories', 'blog_categories.id', '=', 'blog_informations.blog_category_id')
         ->where('blog_informations.language_id', '=', $language->id)
         ->where('blog_categories.status', '=', 1)
@@ -108,32 +103,36 @@ class HomeController extends Controller
     if ($themeVersion == 1) {
       $information['cities'] = City::has('hotel_city')
         ->where('language_id', $language->id)
-        ->inRandomOrder()
+        ->orderByDesc('updated_at')
         ->take(10)
         ->get();
     }
+
     if ($themeVersion == 2 || $themeVersion == 3) {
-      $information['cities'] = City::has('hotel_city')->where('language_id', $language->id)->orderBy('updated_at', 'asc')->get();
+      $information['cities'] = City::has('hotel_city')
+        ->where('language_id', $language->id)
+        ->orderByDesc('updated_at')
+        ->get();
     }
 
     $information['secInfo'] = $secInfo;
 
-    // All active hotels (not just featured) - featured get badge via subquery
     $now = Carbon::now()->format('Y-m-d');
+
     $featuredRoomIds = \App\Models\RoomFeature::where('order_status', 'apporved')
-        ->where('payment_status', 'completed')
-        ->whereDate('end_date', '>=', $now)
-        ->pluck('room_id')
-        ->toArray();
+      ->where('payment_status', 'completed')
+      ->whereDate('end_date', '>=', $now)
+      ->pluck('room_id')
+      ->toArray();
 
     $information['room_contents'] = RoomContent::join('rooms', 'rooms.id', '=', 'room_contents.room_id')
       ->join('hotels', 'rooms.hotel_id', '=', 'hotels.id')
       ->join('room_categories', 'room_contents.room_category', '=', 'room_categories.id')
       ->join('hotel_contents', 'rooms.hotel_id', '=', 'hotel_contents.hotel_id')
       ->join('hotel_categories', 'hotel_contents.category_id', '=', 'hotel_categories.id')
-      ->leftJoin('memberships', function($join) {
-          $join->on('rooms.vendor_id', '=', 'memberships.vendor_id')
-               ->where('memberships.status', '=', 1);
+      ->leftJoin('memberships', function ($join) {
+        $join->on('rooms.vendor_id', '=', 'memberships.vendor_id')
+          ->where('memberships.status', '=', 1);
       })
       ->leftJoin('vendors', 'rooms.vendor_id', '=', 'vendors.id')
       ->where('hotel_contents.language_id', $language->id)
@@ -143,14 +142,25 @@ class HomeController extends Controller
       ->where('rooms.status', '1')
       ->where('hotels.status', '1')
       ->where('hotels.approval_status', 1)
-      ->where(function($q) {
-          $q->where('rooms.vendor_id', 0)
-            ->orWhere(function($q2) {
-                $q2->where('vendors.status', 1)
-                   ->where('memberships.status', 1)
-                   ->where('memberships.start_date', '<=', now()->format('Y-m-d'))
-                   ->where('memberships.expire_date', '>=', now()->format('Y-m-d'));
-            });
+
+      // A hotel can be shown if:
+      // 1) it is an admin/legacy hotel, OR
+      // 2) vendor has an active membership, OR
+      // 3) it was created from an admin-approved LIVE vendor property.
+      ->where(function ($q) {
+        $q->where('rooms.vendor_id', 0)
+          ->orWhere(function ($q2) {
+            $q2->where('vendors.status', 1)
+              ->where('memberships.status', 1)
+              ->where('memberships.start_date', '<=', now()->format('Y-m-d'))
+              ->where('memberships.expire_date', '>=', now()->format('Y-m-d'));
+          })
+          ->orWhereExists(function ($sub) {
+            $sub->select(DB::raw(1))
+              ->from('vendor_properties')
+              ->whereColumn('vendor_properties.hotel_id', 'hotels.id')
+              ->where('vendor_properties.status', 'live');
+          });
       })
       ->select(
         'rooms.*',
@@ -169,11 +179,11 @@ class HomeController extends Controller
         'hotel_contents.state_id',
         'hotel_contents.country_id'
       )
-      ->inRandomOrder()
+      ->orderByDesc('hotels.id')
       ->limit(6)
       ->get()
-      ->each(function($room) use ($featuredRoomIds) {
-          $room->is_featured = in_array($room->id, $featuredRoomIds);
+      ->each(function ($room) use ($featuredRoomIds) {
+        $room->is_featured = in_array($room->id, $featuredRoomIds);
       });
 
     $information['room_contents_count'] = RoomContent::join('rooms', 'rooms.id', '=', 'room_contents.room_id')
@@ -181,6 +191,11 @@ class HomeController extends Controller
       ->join('room_categories', 'room_contents.room_category', '=', 'room_categories.id')
       ->join('hotel_contents', 'rooms.hotel_id', '=', 'hotel_contents.hotel_id')
       ->join('hotel_categories', 'hotel_contents.category_id', '=', 'hotel_categories.id')
+      ->leftJoin('memberships', function ($join) {
+        $join->on('rooms.vendor_id', '=', 'memberships.vendor_id')
+          ->where('memberships.status', '=', 1);
+      })
+      ->leftJoin('vendors', 'rooms.vendor_id', '=', 'vendors.id')
       ->where('hotel_contents.language_id', $language->id)
       ->where('room_categories.status', 1)
       ->where('hotel_categories.status', 1)
@@ -188,6 +203,21 @@ class HomeController extends Controller
       ->where('rooms.status', '1')
       ->where('hotels.status', '1')
       ->where('hotels.approval_status', 1)
+      ->where(function ($q) {
+        $q->where('rooms.vendor_id', 0)
+          ->orWhere(function ($q2) {
+            $q2->where('vendors.status', 1)
+              ->where('memberships.status', 1)
+              ->where('memberships.start_date', '<=', now()->format('Y-m-d'))
+              ->where('memberships.expire_date', '>=', now()->format('Y-m-d'));
+          })
+          ->orWhereExists(function ($sub) {
+            $sub->select(DB::raw(1))
+              ->from('vendor_properties')
+              ->whereColumn('vendor_properties.hotel_id', 'hotels.id')
+              ->where('vendor_properties.status', 'live');
+          });
+      })
       ->select('rooms.id')
       ->get();
 
@@ -211,14 +241,14 @@ class HomeController extends Controller
     }
 
     $sectionInfo = Section::select('custom_section_status')->first();
+
     if (!empty($sectionInfo->custom_section_status)) {
       $info = json_decode($sectionInfo->custom_section_status, true);
       $information['homecusSec'] = $info;
     }
 
-    // Hero section image from basic settings
     $information['images'] = \App\Models\BasicSettings\Basic::select(
-        'hero_section_image'
+      'hero_section_image'
     )->first();
 
     if ($themeVersion == 1) {
@@ -239,15 +269,20 @@ class HomeController extends Controller
     $information['themeVersion'] = Basic::query()->pluck('theme_version')->first();
 
     $information['seoInfo'] = $language->seoInfo()->select('meta_keywords_about_page', 'meta_description_about_page')->first();
+
     $information['pageHeading'] = $misc->getPageHeading($language);
 
     $information['about'] = AboutUs::where('language_id', $language->id)->first();
 
     $information['bgImg'] = $misc->getBreadcrumb();
+
     $secInfo = Section::query()->first();
+
     $information['secInfo'] = $secInfo;
+
     $information['sectionContent'] = SectionContent::where('language_id', $language->id)->first();
-    $information['images']  = Basic::select(
+
+    $information['images'] = Basic::select(
       'about_section_image',
       'feature_section_image',
       'counter_section_image',
@@ -259,6 +294,7 @@ class HomeController extends Controller
     if ($secInfo->about_features_section_status == 1) {
       $information['features'] = Feature::where('language_id', $language->id)->get();
     }
+
     if ($secInfo->work_process_section_status == 1) {
       $information['workProcessSecInfo'] = $language->workProcessSection()->first();
       $information['processes'] = $language->workProcess()->orderBy('serial_number', 'asc')->get();
@@ -277,7 +313,6 @@ class HomeController extends Controller
     $sections = ['about_section', 'features_section', 'counter_section', 'testimonial_section'];
 
     foreach ($sections as $section) {
-
       $information["after_" . str_replace('_section', '', $section)] = CustomSection::where('order', $section)
         ->where('page_type', 'about')
         ->orderBy('serial_number', 'asc')
@@ -285,13 +320,15 @@ class HomeController extends Controller
     }
 
     $sectionInfo = Section::select('about_custom_section_status')->first();
+
     if (!empty($sectionInfo->about_custom_section_status)) {
       $info = json_decode($sectionInfo->about_custom_section_status, true);
       $information['aboutSec'] = $info;
     }
-    
+
     return view('frontend.about-us', $information);
   }
+
   public function pricing(Request $request)
   {
     $misc = new MiscellaneousController();
@@ -301,15 +338,19 @@ class HomeController extends Controller
     $data['seoInfo'] = $language->seoInfo()->select('meta_keyword_pricing', 'meta_description_pricing')->first();
 
     $terms = [];
+
     if (Package::query()->where('status', '1')->where('term', 'monthly')->count() > 0) {
       $terms[] = 'Monthly';
     }
+
     if (Package::query()->where('status', '1')->where('term', 'yearly')->count() > 0) {
       $terms[] = 'Yearly';
     }
+
     if (Package::query()->where('status', '1')->where('term', 'lifetime')->count() > 0) {
       $terms[] = 'Lifetime';
     }
+
     $data['terms'] = $terms;
 
     $data['pageHeading'] = $misc->getPageHeading($language);
@@ -317,116 +358,135 @@ class HomeController extends Controller
     return view('frontend.pricing', $data);
   }
 
-  //offline
   public function offline()
   {
     return view('frontend.offline');
   }
- public function getNearbyRooms(Request $request)
-{
+
+  public function getNearbyRooms(Request $request)
+  {
     $latitude = $request->get('latitude');
     $longitude = $request->get('longitude');
-    $radius = $request->get('radius', 3); // Defaults to 3km filter
-    $checkInDate = $request->filled('checkInDates') ? date('Y-m-d', strtotime($request->checkInDates)) : now()->format('Y-m-d');
+    $radius = $request->get('radius', 3);
+    $checkInDate = $request->filled('checkInDates')
+      ? date('Y-m-d', strtotime($request->checkInDates))
+      : now()->format('Y-m-d');
     $langId = $request->get('lang_id', 1);
 
-    // Structural Base query joining room_contents -> rooms -> hotels -> hotel_contents
     $roomsQuery = DB::table('room_contents')
-        // 1. Join room_contents to rooms table using room_id
-        ->join('rooms', 'room_contents.room_id', '=', 'rooms.id')
-        // 2. Join rooms table to hotels table using hotel_id
-        ->join('hotels', 'rooms.hotel_id', '=', 'hotels.id')
-        // 3. Join hotels to hotel_contents to grab localized hotel titles
-        ->join('hotel_contents', function($join) use ($langId) {
-            $join->on('hotels.id', '=', 'hotel_contents.hotel_id')
-                 ->where('hotel_contents.language_id', '=', $langId);
-        })
-        ->select(
-            'room_contents.*',
-            'rooms.hotel_id',           // Included so loop dependencies do not break
-            'rooms.feature_image',       // Included so loop image generation does not break
-            'rooms.average_rating',      // Included so loop rating mapping does not break
-            'hotel_contents.title as hotelName',
-            'hotel_contents.city_id',
-            'hotel_contents.state_id',
-            'hotel_contents.country_id',
-            'hotel_contents.address as address',
-            'hotels.latitude',
-            'hotels.longitude',
-            DB::raw("(6371 * acos(cos(radians($latitude)) 
-                    * cos(radians(hotels.latitude)) 
-                    * cos(radians(hotels.longitude) - radians($longitude)) 
-                    + sin(radians($latitude)) 
-                    * sin(radians(hotels.latitude)))) AS distance")
-        )
-        ->where('room_contents.language_id', $langId);
+      ->join('rooms', 'room_contents.room_id', '=', 'rooms.id')
+      ->join('hotels', 'rooms.hotel_id', '=', 'hotels.id')
+      ->join('hotel_contents', function ($join) use ($langId) {
+        $join->on('hotels.id', '=', 'hotel_contents.hotel_id')
+          ->where('hotel_contents.language_id', '=', $langId);
+      })
+      ->leftJoin('memberships', function ($join) {
+        $join->on('rooms.vendor_id', '=', 'memberships.vendor_id')
+          ->where('memberships.status', '=', 1);
+      })
+      ->leftJoin('vendors', 'rooms.vendor_id', '=', 'vendors.id')
+      ->select(
+        'room_contents.*',
+        'rooms.hotel_id',
+        'rooms.feature_image',
+        'rooms.average_rating',
+        'hotel_contents.title as hotelName',
+        'hotel_contents.city_id',
+        'hotel_contents.state_id',
+        'hotel_contents.country_id',
+        'hotel_contents.address as address',
+        'hotels.latitude',
+        'hotels.longitude',
+        DB::raw("(6371 * acos(cos(radians($latitude))
+                * cos(radians(hotels.latitude))
+                * cos(radians(hotels.longitude) - radians($longitude))
+                + sin(radians($latitude))
+                * sin(radians(hotels.latitude)))) AS distance")
+      )
+      ->where('room_contents.language_id', $langId)
+      ->where('rooms.status', 1)
+      ->where('hotels.status', 1)
+      ->where('hotels.approval_status', 1)
+      ->where(function ($q) {
+        $q->where('rooms.vendor_id', 0)
+          ->orWhere(function ($q2) {
+            $q2->where('vendors.status', 1)
+              ->where('memberships.status', 1)
+              ->where('memberships.start_date', '<=', now()->format('Y-m-d'))
+              ->where('memberships.expire_date', '>=', now()->format('Y-m-d'));
+          })
+          ->orWhereExists(function ($sub) {
+            $sub->select(DB::raw(1))
+              ->from('vendor_properties')
+              ->whereColumn('vendor_properties.hotel_id', 'hotels.id')
+              ->where('vendor_properties.status', 'live');
+          });
+      });
 
-    // Distance filter always applies, regardless of any additional type filter
     $roomsQuery->having('distance', '<=', $radius);
 
-    // Additional type filter, applied on top of the distance filter
-    if ($request->filled('filter_type')) {
-        if ($request->filter_type == 'premium') {
-            $roomsQuery->where('rooms.average_rating', '>=', 4);
-        }
+    if ($request->filled('filter_type') && $request->filter_type == 'premium') {
+      $roomsQuery->where('rooms.average_rating', '>=', 4);
     }
 
     $rooms = $roomsQuery->orderBy('distance', 'asc')->take(4)->get();
 
-    // Map inventories and structural hourly prices just like your main loop
     foreach ($rooms as $room) {
-        $dailyInventory = DB::table('hotel_daily_inventories')
-            ->where('hotel_id', $room->hotel_id)
-            ->where('booking_date', $checkInDate)
-            ->first();
+      $dailyInventory = DB::table('hotel_daily_inventories')
+        ->where('hotel_id', $room->hotel_id)
+        ->where('booking_date', $checkInDate)
+        ->first();
 
-        // room_contents.id references the unique locale block. We map matching base entity: room_id
-        $prices = HourlyRoomPrice::where('room_id', $room->room_id)
-            ->whereNotNull('hourly_room_prices.price')
-            ->join('booking_hours', 'hourly_room_prices.hour_id', '=', 'booking_hours.id')
-            ->orderBy('booking_hours.serial_number')
-            ->select('hourly_room_prices.*', 'booking_hours.hour')
-            ->get();
+      $prices = HourlyRoomPrice::where('room_id', $room->room_id)
+        ->whereNotNull('hourly_room_prices.price')
+        ->join('booking_hours', 'hourly_room_prices.hour_id', '=', 'booking_hours.id')
+        ->orderBy('booking_hours.serial_number')
+        ->select('hourly_room_prices.*', 'booking_hours.hour')
+        ->get();
 
-        if ($dailyInventory) {
-            foreach ($prices as $priceItem) {
-                if ($priceItem->hour == 3 && !empty($dailyInventory->rate_3hrs)) $priceItem->price = $dailyInventory->rate_3hrs;
-                elseif ($priceItem->hour == 6 && !empty($dailyInventory->rate_6hrs)) $priceItem->price = $dailyInventory->rate_6hrs;
-                elseif ($priceItem->hour == 12 && !empty($dailyInventory->rate_12hrs)) $priceItem->price = $dailyInventory->rate_12hrs;
-                elseif ($priceItem->hour == 24 && !empty($dailyInventory->rate_fullday)) $priceItem->price = $dailyInventory->rate_fullday;
-            }
+      if ($dailyInventory) {
+        foreach ($prices as $priceItem) {
+          if ($priceItem->hour == 3 && !empty($dailyInventory->rate_3hrs)) {
+            $priceItem->price = $dailyInventory->rate_3hrs;
+          } elseif ($priceItem->hour == 6 && !empty($dailyInventory->rate_6hrs)) {
+            $priceItem->price = $dailyInventory->rate_6hrs;
+          } elseif ($priceItem->hour == 12 && !empty($dailyInventory->rate_12hrs)) {
+            $priceItem->price = $dailyInventory->rate_12hrs;
+          } elseif ($priceItem->hour == 24 && !empty($dailyInventory->rate_fullday)) {
+            $priceItem->price = $dailyInventory->rate_fullday;
+          }
         }
-        
-         $city = null;
-    $state = null;
-    $country = null;
+      }
 
-    if ($room->city_id) {
+      $city = null;
+      $state = null;
+      $country = null;
+
+      if ($room->city_id) {
         $city = City::find($room->city_id)?->name;
-    }
+      }
 
-    if ($room->state_id) {
+      if ($room->state_id) {
         $state = State::find($room->state_id)?->name;
-    }
+      }
 
-    if ($room->country_id) {
+      if ($room->country_id) {
         $country = Country::find($room->country_id)?->name;
-    }
-        
-        $room->prices = $prices;
-        $room->city = $city;
-        $room->state = $state;
-        $room->country = $country;
-        $room->startingPrice = $prices->first();
-        $room->formatted_rating = number_format($room->average_rating ?? 0, 1);
-        $room->detail_url = route('frontend.room.details', ['slug' => $room->slug, 'id' => $room->room_id]);
-        $room->image_url = asset('assets/img/room/featureImage/' . $room->feature_image);
+      }
+
+      $room->prices = $prices;
+      $room->city = $city;
+      $room->state = $state;
+      $room->country = $country;
+      $room->startingPrice = $prices->first();
+      $room->formatted_rating = number_format($room->average_rating ?? 0, 1);
+      $room->detail_url = route('frontend.room.details', ['slug' => $room->slug, 'id' => $room->room_id]);
+      $room->image_url = asset('assets/img/room/featureImage/' . $room->feature_image);
     }
 
     return response()->json([
-        'success' => true,
-        'data' => $rooms
+      'success' => true,
+      'data' => $rooms
     ]);
-}
-    
+  }
 }

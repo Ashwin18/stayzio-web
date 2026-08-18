@@ -4,6 +4,11 @@
 
 @section('content')
 @php $badge = $property->status_badge; @endphp
+<style>
+@media(max-width:768px){
+  .property-detail-grid,.property-price-grid{grid-template-columns:1fr!important}
+}
+</style>
 
 <div class="page-hdr">
   <div class="page-hdr-left">
@@ -33,7 +38,7 @@
 
 <div class="card">
   <div class="card-body">
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
+    <div class="property-detail-grid" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
       @foreach([
         ['Hotel Name', $property->hotel_name],
         ['City', $property->city],
@@ -49,7 +54,8 @@
         ['Outstation Couples', $property->allow_outstation_couples === 'yes' ? '✅ Yes' : '❌ No'],
         ['Smoking/Drinking', $property->allow_smoking_drinking === 'yes' ? '✅ Yes' : '❌ No'],
         ['Food Facility', $property->food_facility === 'yes' ? '✅ Yes' : '❌ No'],
-        ['Owner', $property->owner_name . ' (' . $property->owner_contact . ')'],
+        ['Owner / Manager', $property->owner_name . ' (' . $property->owner_contact . ')'],
+        ['Owner Email', $property->owner_email ?? '—'],
         ['GSTIN', $property->gstin ?? '—'],
         ['Bank', ($property->bank_name ?? '—') . ' - ' . ($property->account_number ?? '')],
       ] as [$label, $value])
@@ -60,17 +66,17 @@
       @endforeach
     </div>
 
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:14px">
-      <div style="background:rgba(227,30,36,.04);border:1.5px solid rgba(227,30,36,.15);border-radius:10px;padding:16px;text-align:center">
-        <div style="font-size:22px;font-weight:900;color:#e31e24">₹{{ number_format($property->price_3hrs) }}</div>
+    <div class="property-price-grid" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:14px">
+      <div style="background:rgba(0,184,184,.06);border:1.5px solid rgba(0,184,184,.20);border-radius:10px;padding:16px;text-align:center">
+        <div style="font-size:22px;font-weight:900;color:#00A6A6">₹{{ number_format($property->price_3hrs) }}</div>
         <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;margin-top:4px">3 Hours</div>
       </div>
-      <div style="background:rgba(227,30,36,.04);border:1.5px solid rgba(227,30,36,.15);border-radius:10px;padding:16px;text-align:center">
-        <div style="font-size:22px;font-weight:900;color:#e31e24">₹{{ number_format($property->price_6hrs) }}</div>
+      <div style="background:rgba(0,184,184,.06);border:1.5px solid rgba(0,184,184,.20);border-radius:10px;padding:16px;text-align:center">
+        <div style="font-size:22px;font-weight:900;color:#00A6A6">₹{{ number_format($property->price_6hrs) }}</div>
         <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;margin-top:4px">6 Hours</div>
       </div>
-      <div style="background:rgba(227,30,36,.04);border:1.5px solid rgba(227,30,36,.15);border-radius:10px;padding:16px;text-align:center">
-        <div style="font-size:22px;font-weight:900;color:#e31e24">₹{{ number_format($property->price_fullday) }}</div>
+      <div style="background:rgba(0,184,184,.06);border:1.5px solid rgba(0,184,184,.20);border-radius:10px;padding:16px;text-align:center">
+        <div style="font-size:22px;font-weight:900;color:#00A6A6">₹{{ number_format($property->price_fullday) }}</div>
         <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;margin-top:4px">Full Day</div>
       </div>
     </div>

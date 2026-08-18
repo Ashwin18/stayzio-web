@@ -1,0 +1,263 @@
+
+/*
+|--------------------------------------------------------------------------
+| StayZio hotel-list / hotel-detail header alignment fix
+|--------------------------------------------------------------------------
+| Fixes:
+| 1. Duplicate wordmark beside the logo.
+| 2. Search controls alignment and width.
+| 3. Header navigation spacing.
+| 4. Results/filter content alignment.
+*/
+
+/* Safety: hide old duplicate text if a cached Blade view still contains it. */
+.topbar .stayzio-main-brand > .stayzio-brand-text,
+.site-mobile-menu .smm-brand > .stayzio-brand-text {
+  display:none !important;
+}
+
+/* Main results/detail header */
+.topbar {
+  background:#fff !important;
+  border-bottom:1px solid #E5EBF1 !important;
+}
+
+.topbar-inner {
+  width:100% !important;
+  max-width:1440px !important;
+  min-width:0 !important;
+  height:68px !important;
+  margin:0 auto !important;
+  padding:0 24px !important;
+  gap:14px !important;
+  display:flex !important;
+  align-items:center !important;
+}
+
+/* Logo: only one clean StayZio wordmark */
+.topbar .stayzio-main-brand {
+  flex:0 0 190px !important;
+  min-width:190px !important;
+  max-width:190px !important;
+  display:flex !important;
+  align-items:center !important;
+  margin:0 !important;
+  padding:0 !important;
+  line-height:1 !important;
+}
+
+.topbar .stayzio-main-brand .stayzio-brand-logo {
+  width:190px !important;
+  max-width:190px !important;
+  height:48px !important;
+  max-height:48px !important;
+  object-fit:contain !important;
+  object-position:left center !important;
+  display:block !important;
+}
+
+/* Search strip gets the available center width */
+.topbar .search-strip {
+  flex:1 1 auto !important;
+  min-width:0 !important;
+  max-width:none !important;
+  height:48px !important;
+  margin:0 !important;
+  padding:0 5px 0 0 !important;
+  border-radius:16px !important;
+  overflow:hidden !important;
+  background:#F8FAFC !important;
+}
+
+.topbar .ss-field {
+  min-width:0 !important;
+  height:100% !important;
+  padding:0 11px !important;
+  gap:7px !important;
+  flex:1 1 0 !important;
+}
+
+.topbar .ss-field-location { flex:1.25 1 0 !important; }
+.topbar .ss-field-date { flex:1.05 1 0 !important; }
+.topbar .ss-field-time { flex:1.05 1 0 !important; }
+.topbar .ss-field-duration { flex:.90 1 0 !important; }
+
+.topbar .ss-field-text {
+  width:100% !important;
+  min-width:0 !important;
+  overflow:hidden !important;
+}
+
+.topbar .ss-field-text small {
+  font-size:9px !important;
+  line-height:1.05 !important;
+  margin-bottom:3px !important;
+  white-space:normal !important;
+}
+
+.topbar .ss-field select,
+.topbar .ss-field input[type="date"],
+.topbar .ss-field input[type="time"] {
+  width:100% !important;
+  min-width:0 !important;
+  max-width:100% !important;
+  font-size:12px !important;
+  line-height:1.2 !important;
+}
+
+.topbar .ss-duration-pills {
+  gap:2px !important;
+  padding:2px !important;
+  min-width:0 !important;
+}
+
+.topbar .ss-pill span {
+  padding:4px 5px !important;
+  font-size:10px !important;
+}
+
+.topbar .ss-search-btn {
+  height:38px !important;
+  min-width:94px !important;
+  padding:0 14px !important;
+  margin-left:5px !important;
+  border-radius:11px !important;
+  justify-content:center !important;
+  white-space:nowrap !important;
+  background:#00B8B8 !important;
+}
+
+.topbar .ss-search-btn:hover {
+  background:#009A9A !important;
+}
+
+/* Right side navigation */
+.topbar-right {
+  display:flex !important;
+  align-items:center !important;
+  justify-content:flex-end !important;
+  flex:0 0 auto !important;
+  gap:4px !important;
+  min-width:max-content !important;
+}
+
+.topbar-right .t-link {
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  min-height:38px !important;
+  padding:0 10px !important;
+  font-size:12px !important;
+  font-weight:700 !important;
+  white-space:nowrap !important;
+  color:#5F6F84 !important;
+  border-radius:9px !important;
+}
+
+.topbar-right .t-link:hover {
+  background:#E8FBFB !important;
+  color:#009A9A !important;
+}
+
+.topbar-right .list-hotel-top-link {
+  color:#00A5A5 !important;
+}
+
+.topbar-right .t-btn {
+  height:38px !important;
+  min-width:111px !important;
+  padding:0 13px !important;
+  border-radius:10px !important;
+  background:#00B8B8 !important;
+  color:#fff !important;
+  white-space:nowrap !important;
+}
+
+/* Results page structure */
+.main-layout {
+  max-width:1440px !important;
+  padding:20px 24px 28px !important;
+  grid-template-columns:260px minmax(0,1fr) !important;
+  gap:20px !important;
+}
+
+.sidebar {
+  top:88px !important;
+}
+
+.results-area,
+.results-content,
+.results-column {
+  min-width:0 !important;
+}
+
+/* Keep sort row and hotel cards consistently aligned */
+.sort-bar,
+.results-sort,
+.sort-section {
+  width:100% !important;
+  margin-left:0 !important;
+  margin-right:0 !important;
+}
+
+.hotel-card {
+  width:100% !important;
+  max-width:100% !important;
+}
+
+/* Tablet */
+@media (max-width:1220px) {
+  .topbar-inner {
+    padding:0 16px !important;
+    gap:9px !important;
+  }
+
+  .topbar .stayzio-main-brand {
+    flex-basis:160px !important;
+    min-width:160px !important;
+    max-width:160px !important;
+  }
+
+  .topbar .stayzio-main-brand .stayzio-brand-logo {
+    width:160px !important;
+    max-width:160px !important;
+  }
+
+  .topbar-right .t-link {
+    padding:0 7px !important;
+    font-size:11px !important;
+  }
+
+  .results-top-link {
+    display:none !important;
+  }
+}
+
+/* Existing mobile header/menu continues to take over */
+@media (max-width:992px) {
+  .topbar-inner {
+    height:64px !important;
+  }
+
+  .topbar .search-strip,
+  .topbar-right {
+    display:none !important;
+  }
+
+  .topbar .stayzio-main-brand {
+    flex:0 0 auto !important;
+    min-width:0 !important;
+    max-width:none !important;
+  }
+
+  .topbar .stayzio-main-brand .stayzio-brand-logo {
+    width:auto !important;
+    height:42px !important;
+    max-height:42px !important;
+  }
+
+  .main-layout {
+    padding:16px !important;
+    grid-template-columns:1fr !important;
+  }
+}

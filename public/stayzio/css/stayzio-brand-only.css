@@ -1,0 +1,216 @@
+/*
+|--------------------------------------------------------------------------
+| StayZio Full Frontend Brand Override
+|--------------------------------------------------------------------------
+| Keeps existing layouts/functionality. Changes only logo + brand colors.
+| Navy #0B1F3A | Teal #00B8B8 | White #FFFFFF | Text #2D3748
+*/
+
+:root{
+  --stayzio-navy:#0B1F3A;
+  --stayzio-navy-2:#143A63;
+  --stayzio-teal:#00B8B8;
+  --stayzio-teal-dark:#009A9A;
+  --stayzio-teal-soft:#E8FBFB;
+  --stayzio-white:#FFFFFF;
+  --stayzio-text:#2D3748;
+  --stayzio-muted:#718096;
+  --stayzio-border:#E5EBF1;
+
+  /* Existing StayZio CSS variable aliases */
+  --red:#00B8B8 !important;
+  --red-dark:#009A9A !important;
+  --red-soft:#E8FBFB !important;
+  --red-light:#E8FBFB !important;
+  --red-mid:#BDEEEE !important;
+  --dark:#0B1F3A !important;
+  --ink:#0B1F3A !important;
+  --ink-mid:#2D3748 !important;
+  --text:#2D3748 !important;
+}
+
+html,body{color:var(--stayzio-text)}
+body{background:#fff}
+h1,h2,h3,h4,h5,h6{color:var(--stayzio-navy)}
+
+/* HEADER / NAVIGATION */
+.navbar-section{
+  background:#fff !important;
+  border-bottom:1px solid rgba(11,31,58,.07) !important;
+  box-shadow:0 3px 16px rgba(11,31,58,.07) !important;
+}
+.navbar .nav-link,.navbar-brand{color:var(--stayzio-navy) !important}
+.navbar .nav-link:hover,.navbar .nav-link:focus,
+.dropdown-item:hover,.dropdown-item:focus{
+  background:var(--stayzio-teal-soft) !important;
+  color:var(--stayzio-teal-dark) !important;
+}
+.btn-rounded{
+  color:var(--stayzio-navy) !important;
+  border-color:var(--stayzio-navy) !important;
+}
+.btn-rounded:hover{
+  background:var(--stayzio-teal) !important;
+  border-color:var(--stayzio-teal) !important;
+  color:#fff !important;
+}
+.site-hamburger{color:var(--stayzio-navy) !important}
+.site-mobile-menu a{color:var(--stayzio-navy) !important}
+.site-mobile-menu a:hover,.site-mobile-menu .smm-login{
+  background:var(--stayzio-teal-soft) !important;
+  color:var(--stayzio-teal-dark) !important;
+}
+.stayzio-brand-logo{object-fit:contain}
+
+/* HOME HERO - SAME CURRENT LAYOUT */
+.hero-section{
+  background:
+    linear-gradient(90deg,rgba(11,31,58,.92) 0%,rgba(11,31,58,.82) 40%,rgba(11,31,58,.28) 68%,transparent 100%),
+    url('../images/hyd.jpg') !important;
+  background-size:cover !important;
+  background-position:center !important;
+}
+.sz-hero-overlay{
+  background:linear-gradient(
+    90deg,
+    rgba(11,31,58,.94) 0%,
+    rgba(11,31,58,.80) 41%,
+    rgba(11,31,58,.28) 70%,
+    rgba(11,31,58,.10) 100%
+  ) !important;
+}
+.sz-hero-txt h1,.sz-hero-txt p{color:#fff !important}
+.sz-hero-txt h1 span{color:#C8F7F7 !important}
+.sz-search-inner{
+  box-shadow:0 20px 50px -14px rgba(11,31,58,.28),0 4px 14px rgba(0,0,0,.06) !important;
+}
+.sz-search-inner .search-btn,
+.duration-tabs button.active,
+.time-toggle button.active,
+.tabs .active,.tab-slider{
+  background:var(--stayzio-teal) !important;
+  color:#fff !important;
+}
+.sz-search-inner .search-btn:hover{background:var(--stayzio-teal-dark) !important}
+.time-opt:hover{
+  background:var(--stayzio-teal-soft) !important;
+  color:var(--stayzio-teal-dark) !important;
+}
+
+/* TOP CITY / FEATURE ACCENTS */
+.city-icon,.city-card-icon,.feature-icon,.benefit-icon{
+  background:linear-gradient(135deg,#70D7D7,var(--stayzio-teal)) !important;
+  color:#fff !important;
+}
+
+/* BUTTONS / CTA - CUSTOMER FRONTEND */
+.btn-primary,.primary-btn,.search-btn,.booking-btn,.book-btn,.book-now-btn,
+.reserve-btn,.submit-btn,.topbar-btn,.t-btn,.ss-search-btn,.login-card .btn,
+.auth-btn,.continue-btn,.checkout-btn,.payment-btn,.confirm-btn{
+  background:var(--stayzio-teal) !important;
+  border-color:var(--stayzio-teal) !important;
+  color:#fff !important;
+}
+.btn-primary:hover,.primary-btn:hover,.search-btn:hover,.booking-btn:hover,.book-btn:hover,
+.book-now-btn:hover,.reserve-btn:hover,.submit-btn:hover,.topbar-btn:hover,.t-btn:hover,
+.ss-search-btn:hover,.login-card .btn:hover,.auth-btn:hover,.continue-btn:hover,
+.checkout-btn:hover,.payment-btn:hover,.confirm-btn:hover{
+  background:var(--stayzio-teal-dark) !important;
+  border-color:var(--stayzio-teal-dark) !important;
+  color:#fff !important;
+}
+
+/* HOTEL LIST */
+.topbar{
+  border-bottom-color:var(--stayzio-border) !important;
+}
+.topbar-brand,.brand,.ss-field i{color:var(--stayzio-navy) !important}
+.search-strip:focus-within,.form-control:focus,.form-select:focus{
+  border-color:var(--stayzio-teal) !important;
+  box-shadow:0 0 0 3px rgba(0,184,184,.12) !important;
+}
+.ss-pill input:checked + span{
+  background:var(--stayzio-teal) !important;
+  color:#fff !important;
+}
+.price,.price-value,.hotel-price,.room-price{
+  color:var(--stayzio-navy) !important;
+}
+.rating-badge,.offer-badge,.promo-badge,.tag-active,.badge-primary{
+  background:var(--stayzio-teal-soft) !important;
+  color:var(--stayzio-teal-dark) !important;
+}
+.hotel-card:hover,.room-card:hover{
+  border-color:rgba(0,184,184,.28) !important;
+}
+
+/* HOTEL DETAILS */
+.room-card .btn,.reserve-btn,.book-now-btn{
+  background:var(--stayzio-teal) !important;
+  color:#fff !important;
+}
+.nav-tabs .nav-link.active,.detail-tabs .active{
+  color:var(--stayzio-teal-dark) !important;
+  border-color:var(--stayzio-teal) !important;
+}
+
+/* LOGIN / OTP / SIGNUP */
+.login-hero{
+  background:linear-gradient(135deg,#0B1F3A 0%,#143A63 60%,#0B1F3A 100%) !important;
+}
+.swiftbtn{border-color:var(--stayzio-teal) !important}
+.swiftbtn h6.active{
+  background:var(--stayzio-teal) !important;
+  color:#fff !important;
+}
+.swiftbtn h6:not(.active){color:var(--stayzio-navy) !important}
+.login-card input:focus,.auth-card input:focus,.otp-input:focus{
+  border-color:var(--stayzio-teal) !important;
+  box-shadow:0 0 0 3px rgba(0,184,184,.12) !important;
+  outline:none !important;
+}
+
+/* USER DASHBOARD / PROFILE / BOOKINGS */
+.user-sidebar .active,.profile-sidebar .active,.sidebar-menu .active,
+.nav-pills .nav-link.active,.dashboard-nav .active,.booking-tabs .active,
+.pagination .page-item.active .page-link{
+  background:var(--stayzio-teal) !important;
+  border-color:var(--stayzio-teal) !important;
+  color:#fff !important;
+}
+.pagination .page-link{color:var(--stayzio-navy) !important}
+.dashboard-card i,.profile-card i,.booking-card i{
+  color:var(--stayzio-teal-dark) !important;
+}
+.form-check-input:checked{
+  background-color:var(--stayzio-teal) !important;
+  border-color:var(--stayzio-teal) !important;
+}
+
+/* FOOTER */
+.stayzio-footer{
+  background:var(--stayzio-navy) !important;
+  color:rgba(255,255,255,.74) !important;
+}
+.stayzio-footer h5{color:#fff !important}
+.stayzio-footer p,.stayzio-footer a{
+  color:rgba(255,255,255,.74) !important;
+}
+.stayzio-footer a:hover{color:#82EAEA !important}
+.stayzio-socials a{
+  background:rgba(255,255,255,.08) !important;
+  border-color:rgba(255,255,255,.12) !important;
+  color:#fff !important;
+}
+.stayzio-socials a:hover{
+  background:var(--stayzio-teal) !important;
+  border-color:var(--stayzio-teal) !important;
+}
+
+/* LOADER / UTILITY */
+.stayzio-loader-line span,.go-top{
+  background:var(--stayzio-teal) !important;
+}
+.go-top{color:#fff !important}
+
+/* Important: no layout, width, height, grid or breakpoint structure is changed here. */

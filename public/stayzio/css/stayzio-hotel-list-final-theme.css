@@ -1,0 +1,493 @@
+
+/*
+|--------------------------------------------------------------------------
+| StayZio Hotel List - Final Navy / Teal UI Fix
+|--------------------------------------------------------------------------
+| Fixes the exact issues from the current /rooms page:
+| - Red filter states -> StayZio Teal
+| - Congested top search -> wider, cleaner grid
+| - Hotel 3H/6H/Day price tabs -> Teal/neutral theme
+| - Red shadows/highlights -> Teal
+*/
+
+:root{
+  --sz-navy:#0B1F3A;
+  --sz-teal:#00B8B8;
+  --sz-teal-dark:#009A9A;
+  --sz-teal-soft:#E8FBFB;
+  --sz-teal-border:#AEE9E9;
+  --sz-text:#2D3748;
+  --sz-muted:#64748B;
+  --sz-border:#E5EBF1;
+  --sz-surface:#F7F9FB;
+}
+
+/* =========================================================
+   HEADER + SEARCH: give every control proper breathing room
+   ========================================================= */
+body .topbar{
+  background:#fff !important;
+  border-bottom:1px solid var(--sz-border) !important;
+  box-shadow:0 3px 14px rgba(11,31,58,.06) !important;
+}
+
+body .topbar-inner{
+  width:100% !important;
+  max-width:1480px !important;
+  height:76px !important;
+  margin:0 auto !important;
+  padding:0 22px !important;
+  display:grid !important;
+  grid-template-columns:180px minmax(650px,1fr) auto !important;
+  align-items:center !important;
+  column-gap:16px !important;
+}
+
+/* Logo */
+body .topbar .stayzio-main-brand{
+  width:180px !important;
+  min-width:180px !important;
+  max-width:180px !important;
+  display:flex !important;
+  align-items:center !important;
+}
+
+body .topbar .stayzio-brand-logo{
+  width:170px !important;
+  max-width:170px !important;
+  height:50px !important;
+  max-height:50px !important;
+  object-fit:contain !important;
+  object-position:left center !important;
+}
+
+/* Search container - changed from squeezed flex to clean grid */
+body .topbar .search-strip{
+  width:100% !important;
+  max-width:none !important;
+  min-width:0 !important;
+  height:52px !important;
+  margin:0 !important;
+  padding:4px !important;
+  display:grid !important;
+  grid-template-columns:
+      minmax(180px,1.25fr)
+      minmax(150px,1fr)
+      minmax(140px,.9fr)
+      minmax(145px,.92fr)
+      108px !important;
+  align-items:stretch !important;
+  gap:0 !important;
+  background:#F7F9FB !important;
+  border:1px solid #E3E9EF !important;
+  border-radius:15px !important;
+  overflow:hidden !important;
+  box-shadow:none !important;
+}
+
+body .topbar .search-strip:focus-within{
+  border-color:rgba(0,184,184,.45) !important;
+  box-shadow:0 0 0 3px rgba(0,184,184,.08) !important;
+}
+
+body .topbar .ss-field{
+  width:100% !important;
+  min-width:0 !important;
+  height:44px !important;
+  padding:5px 12px !important;
+  margin:0 !important;
+  display:flex !important;
+  align-items:center !important;
+  gap:8px !important;
+  border-right:1px solid #E3E9EF !important;
+  overflow:hidden !important;
+}
+
+body .topbar .ss-field i{
+  color:var(--sz-navy) !important;
+  font-size:12px !important;
+  width:14px !important;
+  text-align:center !important;
+  flex:0 0 14px !important;
+}
+
+body .topbar .ss-field-text{
+  width:100% !important;
+  min-width:0 !important;
+  display:flex !important;
+  flex-direction:column !important;
+  justify-content:center !important;
+}
+
+body .topbar .ss-field-text small{
+  display:block !important;
+  margin:0 0 3px !important;
+  color:#91A0B2 !important;
+  font-size:9px !important;
+  font-weight:800 !important;
+  line-height:1 !important;
+  letter-spacing:.055em !important;
+  white-space:nowrap !important;
+  overflow:hidden !important;
+  text-overflow:ellipsis !important;
+}
+
+body .topbar .ss-field select,
+body .topbar .ss-field input[type="date"],
+body .topbar .ss-field input[type="time"]{
+  width:100% !important;
+  min-width:0 !important;
+  max-width:100% !important;
+  height:19px !important;
+  padding:0 !important;
+  margin:0 !important;
+  border:0 !important;
+  background:transparent !important;
+  color:var(--sz-navy) !important;
+  font-family:'Poppins',sans-serif !important;
+  font-size:11.5px !important;
+  font-weight:700 !important;
+  line-height:19px !important;
+  outline:none !important;
+}
+
+/* Duration header segmented switch */
+body .topbar .ss-duration-pills{
+  width:100% !important;
+  min-width:0 !important;
+  height:27px !important;
+  display:grid !important;
+  grid-template-columns:repeat(3,1fr) !important;
+  gap:2px !important;
+  padding:2px !important;
+  background:#ECEFF2 !important;
+  border-radius:8px !important;
+}
+
+body .topbar .ss-pill{
+  min-width:0 !important;
+}
+
+body .topbar .ss-pill span{
+  height:23px !important;
+  padding:0 4px !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  color:#778391 !important;
+  font-size:10px !important;
+  font-weight:800 !important;
+  border-radius:6px !important;
+  background:transparent !important;
+}
+
+body .topbar .ss-pill input:checked + span{
+  background:var(--sz-teal) !important;
+  color:#fff !important;
+  box-shadow:0 2px 6px rgba(0,184,184,.20) !important;
+}
+
+/* Search button */
+body .topbar .ss-search-btn{
+  width:100% !important;
+  min-width:0 !important;
+  height:44px !important;
+  margin:0 !important;
+  padding:0 12px !important;
+  border:0 !important;
+  border-radius:11px !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  gap:7px !important;
+  background:var(--sz-teal) !important;
+  color:#fff !important;
+  box-shadow:0 5px 12px rgba(0,184,184,.18) !important;
+}
+
+body .topbar .ss-search-btn:hover{
+  background:var(--sz-teal-dark) !important;
+}
+
+/* Header right actions */
+body .topbar-right{
+  min-width:max-content !important;
+  display:flex !important;
+  align-items:center !important;
+  gap:2px !important;
+}
+
+body .topbar-right .t-link{
+  min-height:36px !important;
+  padding:0 9px !important;
+  display:inline-flex !important;
+  align-items:center !important;
+  color:#5E6D81 !important;
+  font-size:11px !important;
+  font-weight:700 !important;
+  border-radius:8px !important;
+  white-space:nowrap !important;
+}
+
+body .topbar-right .t-link:hover{
+  background:var(--sz-teal-soft) !important;
+  color:var(--sz-teal-dark) !important;
+}
+
+body .topbar-right .list-hotel-top-link{
+  color:var(--sz-teal-dark) !important;
+}
+
+body .topbar-right .t-btn{
+  height:38px !important;
+  padding:0 14px !important;
+  background:var(--sz-teal) !important;
+  border-color:var(--sz-teal) !important;
+  color:#fff !important;
+  border-radius:10px !important;
+  font-size:11px !important;
+  font-weight:700 !important;
+  white-space:nowrap !important;
+}
+
+/* =========================================================
+   LEFT FILTERS - remove all legacy red
+   ========================================================= */
+body .sidebar{
+  border:1px solid var(--sz-border) !important;
+  box-shadow:0 5px 18px rgba(11,31,58,.05) !important;
+}
+
+body .sidebar-header h3{
+  color:var(--sz-navy) !important;
+}
+
+body .sidebar-header h3 i,
+body .clear-all{
+  color:var(--sz-teal-dark) !important;
+}
+
+body .filter-title{
+  color:var(--sz-text) !important;
+}
+
+/* Normal chip */
+body .sidebar .chip{
+  background:#fff !important;
+  color:#5D6775 !important;
+  border:1px solid #E1E6EC !important;
+  box-shadow:none !important;
+}
+
+/* Hover */
+body .sidebar .chip:hover{
+  color:var(--sz-teal-dark) !important;
+  border-color:var(--sz-teal) !important;
+  background:#F6FEFE !important;
+}
+
+/* Selected filter - use subtle teal, not harsh solid fill */
+body .sidebar .chip.selected{
+  color:var(--sz-teal-dark) !important;
+  border-color:var(--sz-teal) !important;
+  background:var(--sz-teal-soft) !important;
+  box-shadow:inset 0 0 0 1px rgba(0,184,184,.06) !important;
+}
+
+/* All checkbox/range controls */
+body .sidebar input[type="checkbox"],
+body .sidebar input[type="radio"],
+body .sidebar input[type="range"]{
+  accent-color:var(--sz-teal) !important;
+}
+
+body .sidebar .range-fill{
+  background:var(--sz-teal) !important;
+}
+
+body .sidebar .range-thumb{
+  border-color:var(--sz-teal) !important;
+  box-shadow:0 2px 6px rgba(0,184,184,.22) !important;
+}
+
+body .sidebar .rating-chip:hover,
+body .sidebar .rating-chip.selected{
+  color:var(--sz-teal-dark) !important;
+  border-color:var(--sz-teal) !important;
+  background:var(--sz-teal-soft) !important;
+}
+
+/* =========================================================
+   SORT CONTROLS
+   ========================================================= */
+body .sort-btn:hover{
+  border-color:var(--sz-teal) !important;
+  color:var(--sz-teal-dark) !important;
+}
+
+body .sort-btn.active,
+body .view-btn.active{
+  background:var(--sz-teal) !important;
+  border-color:var(--sz-teal) !important;
+  color:#fff !important;
+}
+
+/* =========================================================
+   HOTEL CARD ACCENTS + 3H/6H/DAY TABS
+   ========================================================= */
+body .card-location i{
+  color:var(--sz-teal) !important;
+}
+
+body .ctag.highlight{
+  background:var(--sz-teal-soft) !important;
+  border-color:var(--sz-teal-border) !important;
+  color:var(--sz-teal-dark) !important;
+}
+
+/* Price durations: neutral by default */
+body .hotel-card .dtab{
+  min-width:72px !important;
+  padding:7px 9px !important;
+  border:1px solid #DCE3EA !important;
+  background:#fff !important;
+  border-radius:10px !important;
+  box-shadow:none !important;
+  transition:border-color .15s, background .15s, transform .15s !important;
+}
+
+/* Explicitly kill any old red gradient */
+body .hotel-card .dtab,
+body .hotel-card .dtab::before,
+body .hotel-card .dtab::after{
+  background-image:none !important;
+}
+
+body .hotel-card .dtab:hover{
+  border-color:var(--sz-teal) !important;
+  background:#F8FFFF !important;
+  transform:translateY(-1px) !important;
+}
+
+/* Selected 3H / 6H / Day */
+body .hotel-card .dtab.active{
+  border-color:var(--sz-teal) !important;
+  background:var(--sz-teal-soft) !important;
+  box-shadow:inset 0 0 0 1px rgba(0,184,184,.08) !important;
+}
+
+body .hotel-card .dtab .dtab-label{
+  color:#7E8998 !important;
+}
+
+body .hotel-card .dtab .dtab-price{
+  color:var(--sz-navy) !important;
+}
+
+body .hotel-card .dtab.active .dtab-label,
+body .hotel-card .dtab.active .dtab-price{
+  color:var(--sz-teal-dark) !important;
+}
+
+body .hotel-card .dtab-sub{
+  color:#9AA5B3 !important;
+}
+
+/* Book now */
+body .hotel-card .btn-book{
+  background:var(--sz-teal) !important;
+  border-color:var(--sz-teal) !important;
+  color:#fff !important;
+  box-shadow:0 7px 16px rgba(0,184,184,.20) !important;
+}
+
+body .hotel-card .btn-book:hover{
+  background:var(--sz-teal-dark) !important;
+  box-shadow:0 9px 20px rgba(0,184,184,.26) !important;
+}
+
+body .hotel-card .btn-view-more:hover{
+  border-color:var(--sz-teal) !important;
+  color:var(--sz-teal-dark) !important;
+}
+
+body .wishlist-btn:hover,
+body .wishlist-btn.active{
+  color:var(--sz-teal-dark) !important;
+  background:var(--sz-teal-soft) !important;
+}
+
+/* Any "red" image badge becomes branded teal */
+body .img-badge.red{
+  background:var(--sz-teal) !important;
+  color:#fff !important;
+}
+
+/* Pagination */
+body .pg-btn:hover{
+  border-color:var(--sz-teal) !important;
+  color:var(--sz-teal-dark) !important;
+}
+
+body .pg-btn.active{
+  background:var(--sz-teal) !important;
+  border-color:var(--sz-teal) !important;
+  color:#fff !important;
+}
+
+/* =========================================================
+   RESPONSIVE HEADER
+   ========================================================= */
+@media(max-width:1320px){
+  body .topbar-inner{
+    grid-template-columns:155px minmax(590px,1fr) auto !important;
+    padding:0 14px !important;
+    column-gap:10px !important;
+  }
+
+  body .topbar .stayzio-main-brand{
+    width:155px !important;
+    min-width:155px !important;
+    max-width:155px !important;
+  }
+
+  body .topbar .stayzio-brand-logo{
+    width:148px !important;
+    max-width:148px !important;
+  }
+
+  body .topbar .search-strip{
+    grid-template-columns:minmax(155px,1.2fr) minmax(130px,1fr) minmax(120px,.9fr) 130px 98px !important;
+  }
+
+  body .topbar-right .results-top-link{
+    display:none !important;
+  }
+
+  body .topbar-right .t-link{
+    padding:0 6px !important;
+  }
+}
+
+@media(max-width:1050px){
+  body .topbar-inner{
+    display:flex !important;
+    height:66px !important;
+  }
+
+  body .topbar .search-strip,
+  body .topbar-right{
+    display:none !important;
+  }
+
+  body .topbar .stayzio-main-brand{
+    width:auto !important;
+    min-width:0 !important;
+    max-width:none !important;
+  }
+
+  body .topbar .stayzio-brand-logo{
+    width:155px !important;
+    height:44px !important;
+  }
+}

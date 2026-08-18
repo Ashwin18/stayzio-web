@@ -1,0 +1,142 @@
+
+/*
+|--------------------------------------------------------------------------
+| StayZio Footer Fix
+|--------------------------------------------------------------------------
+| Applied globally because frontend pages use the shared footer partial.
+*/
+
+.stayzio-footer {
+    width: 100% !important;
+    background: #0B1F3A !important;
+    color: rgba(255,255,255,.78) !important;
+    padding: 48px 0 34px !important;
+    margin: 0 !important;
+    border-top: 0 !important;
+}
+
+.stayzio-footer-inner {
+    width: min(1180px, calc(100% - 40px)) !important;
+    max-width: 1180px !important;
+    margin: 0 auto !important;
+    padding: 0 !important;
+    display: grid !important;
+    grid-template-columns: 1.6fr 1fr 1fr 1fr !important;
+    gap: 44px !important;
+    align-items: start !important;
+}
+
+.stayzio-footer-brand {
+    min-width: 0 !important;
+}
+
+.stayzio-footer-logo {
+    display: inline-flex !important;
+    align-items: center !important;
+    margin-bottom: 16px !important;
+}
+
+/* Logo image already contains the full wordmark */
+.stayzio-footer-logo > span {
+    display: none !important;
+}
+
+.stayzio-footer-logo img {
+    width: 170px !important;
+    max-width: 170px !important;
+    height: auto !important;
+    max-height: 48px !important;
+    object-fit: contain !important;
+    object-position: left center !important;
+    display: block !important;
+    filter: brightness(0) invert(1) !important;
+}
+
+.stayzio-footer-brand p {
+    max-width: 330px !important;
+    margin: 0 0 18px !important;
+    color: rgba(255,255,255,.72) !important;
+    font-size: 13px !important;
+    line-height: 1.75 !important;
+}
+
+.stayzio-footer-col h5 {
+    margin: 0 0 16px !important;
+    color: #FFFFFF !important;
+    font-size: 12px !important;
+    font-weight: 800 !important;
+    letter-spacing: .12em !important;
+    text-transform: uppercase !important;
+}
+
+.stayzio-footer-col a {
+    display: block !important;
+    width: fit-content !important;
+    margin: 0 0 10px !important;
+    color: rgba(255,255,255,.70) !important;
+    font-size: 13px !important;
+    line-height: 1.45 !important;
+    text-decoration: none !important;
+}
+
+.stayzio-footer-col a:hover {
+    color: #63E2E2 !important;
+}
+
+.stayzio-socials {
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+}
+
+.stayzio-socials a {
+    width: 34px !important;
+    height: 34px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 50% !important;
+    background: rgba(255,255,255,.08) !important;
+    border: 1px solid rgba(255,255,255,.14) !important;
+    color: #FFFFFF !important;
+    font-size: 13px !important;
+    margin: 0 !important;
+}
+
+.stayzio-socials a:hover {
+    background: #00B8B8 !important;
+    border-color: #00B8B8 !important;
+    color: #FFFFFF !important;
+}
+
+/* Prevent page-specific styles from washing out the footer */
+.stayzio-footer *,
+.stayzio-footer p,
+.stayzio-footer span {
+    opacity: 1 !important;
+}
+
+/* Tablet */
+@media (max-width: 900px) {
+    .stayzio-footer-inner {
+        grid-template-columns: 1fr 1fr !important;
+        gap: 32px !important;
+    }
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+    .stayzio-footer {
+        padding: 38px 0 26px !important;
+    }
+
+    .stayzio-footer-inner {
+        width: min(100% - 30px, 1180px) !important;
+        grid-template-columns: 1fr !important;
+        gap: 26px !important;
+    }
+
+    .stayzio-footer-logo img {
+        width: 150px !important;
+    }
+}

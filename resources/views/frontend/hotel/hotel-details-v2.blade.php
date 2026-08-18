@@ -52,6 +52,85 @@
 
   // ── Gallery images ──
   $galleryImages = $hotelImages ?? collect();
+  // ── Vendor-property fallback ──
+  // Some hotels were created from the new vendor submission workflow before
+  // policies/restrictions were fully copied into hotel_contents.
+  $vendorProperty = \Illuminate\Support\Facades\DB::table('vendor_properties')
+      ->where('hotel_id', $hotel->id)
+      ->where('status', 'live')
+      ->orderByDesc('id')
+      ->first();
+
+  $decodeVendorArray = function ($value) {
+      if (is_array($value)) return $value;
+      if ($value === null || $value === '') return [];
+
+      $decoded = $value;
+      for ($i = 0; $i < 3; $i++) {
+          if (!is_string($decoded)) break;
+          $tmp = json_decode($decoded, true);
+          if (json_last_error() !== JSON_ERROR_NONE) break;
+          $decoded = $tmp;
+      }
+      return is_array($decoded) ? $decoded : [];
+  };
+
+  // Existing hotel_contents restrictions remain primary.
+  // If missing, recover what the vendor selected before Admin made it Live.
+  if (count($hotelRestrictions) === 0 && $vendorProperty) {
+      $vendorRestrictionIds = $decodeVendorArray($vendorProperty->selected_restrictions ?? null);
+
+      if (!empty($vendorRestrictionIds)) {
+          $vendorRestrictionRows = \App\Models\HotelRestriction::whereIn('id', $vendorRestrictionIds)
+              ->where('status', 1)
+              ->get();
+
+          $hotelRestrictions = $vendorRestrictionRows;
+          $restrMap = [];
+
+          foreach ($vendorRestrictionRows as $rr) {
+              $restrMap[$rr->id] = $rr->default_type ?? 'not_allowed';
+          }
+      }
+  }
+
+  // The vendor form stores operational policies as explicit yes/no fields,
+  // not as hotel_policies master IDs. Build policy rows directly from the
+  // submitted data so existing Live properties (such as Hotel Shakthi) show
+  // exactly what the vendor entered.
+  $vendorPolicyRows = [];
+
+  if ($vendorProperty) {
+      $yesNo = fn($v) => strtolower((string)$v) === 'yes' ? 'Allowed' : 'Not Allowed';
+
+      $vendorPolicyRows[] = [
+          'title' => 'Same-city couples',
+          'value' => $yesNo($vendorProperty->allow_same_city_couples ?? 'no'),
+          'icon'  => 'fas fa-user-friends',
+      ];
+      $vendorPolicyRows[] = [
+          'title' => 'Outstation couples',
+          'value' => $yesNo($vendorProperty->allow_outstation_couples ?? 'no'),
+          'icon'  => 'fas fa-route',
+      ];
+      $vendorPolicyRows[] = [
+          'title' => 'Smoking / Drinking',
+          'value' => $yesNo($vendorProperty->allow_smoking_drinking ?? 'no'),
+          'icon'  => 'fas fa-smoking-ban',
+      ];
+      $vendorPolicyRows[] = [
+          'title' => 'Food facility',
+          'value' => strtolower((string)($vendorProperty->food_facility ?? 'no')) === 'yes' ? 'Available' : 'Not Available',
+          'icon'  => 'fas fa-utensils',
+      ];
+      $vendorPolicyRows[] = [
+          'title' => 'Cancellation policy',
+          'value' => strtolower((string)($vendorProperty->cancellation_policy_acceptance ?? 'no')) === 'yes'
+              ? 'Accepted by property'
+              : 'Not confirmed',
+          'icon'  => 'fas fa-rotate-left',
+      ];
+  }
 @endphp
 
 {{-- ── STYLES ── --}}
@@ -335,7 +414,7 @@
     @if($hotelPerks->count() > 0)
     <button class="hd-tab" onclick="hdTab('sec-perks',this)"><i class="fas fa-gem"></i> Perks</button>
     @endif
-    @if($hotelPolicies->count() > 0)
+    @if($hotelPolicies->count() > 0 || count($vendorPolicyRows) > 0)
     <button class="hd-tab" onclick="hdTab('sec-policies',this)"><i class="fas fa-clipboard-list"></i> Policies</button>
     @endif
     @if(count($hotelRestrictions) > 0)
@@ -397,7 +476,7 @@
   @endif
 
   {{-- POLICIES --}}
-  @if($hotelPolicies->count() > 0)
+  @if($hotelPolicies->count() > 0 || count($vendorPolicyRows) > 0)
   <div class="hd-scard" id="sec-policies">
     <div class="hd-scard-head">
       <div class="hd-scard-icon"><i class="fas fa-clipboard-list"></i></div>
@@ -405,6 +484,13 @@
     </div>
     <div class="hd-scard-body">
       <div class="hd-pol-grid">
+        @foreach($vendorPolicyRows as $vpol)
+        <div class="hd-pol-item">
+          <div class="hd-pol-label"><i class="{{ $vpol['icon'] }}"></i> {{ $vpol['title'] }}</div>
+          <div class="hd-pol-val">{{ $vpol['value'] }}</div>
+        </div>
+        @endforeach
+
         @foreach($hotelPolicies as $pol)
         <div class="hd-pol-item">
           <div class="hd-pol-label"><i class="{{ $pol->icon }}"></i> {{ $pol->title }}</div>
@@ -841,10 +927,20 @@ window.addEventListener('DOMContentLoaded', function() {
   var co = document.getElementById('hdCheckOut');
   var mci = document.getElementById('hdMCheckIn');
   var mco = document.getElementById('hdMCheckOut');
-  if(ci) ci.value = fmt(today);
-  if(co) co.value = fmt(d3);
-  if(mci) mci.value = fmt(today);
-  if(mco) mco.value = fmt(d3);
+  var urlParamsInitial = new URLSearchParams(window.location.search);
+  var incomingDate = urlParamsInitial.get('date_range') || urlParamsInitial.get('checkInDates') || fmt(today);
+
+  // Prevent past dates from being restored from an old URL.
+  if (incomingDate < fmt(today)) incomingDate = fmt(today);
+
+  var incomingDateObj = new Date(incomingDate + 'T00:00:00');
+  var incomingNextDay = new Date(incomingDateObj);
+  incomingNextDay.setDate(incomingNextDay.getDate() + 1);
+
+  if(ci) ci.value = incomingDate;
+  if(co) co.value = fmt(incomingNextDay);
+  if(mci) mci.value = incomingDate;
+  if(mco) mco.value = fmt(incomingNextDay);
 
   // Init first slot
   var firstSlot = document.querySelector('#hdSlots .hd-bw-slot.active');
@@ -992,16 +1088,64 @@ function hdRefreshAvailability() {
 // Run once automatically on page load, to fix stale server-rendered prices from the very start
 document.addEventListener('DOMContentLoaded', function() {
   hdRefreshAvailability();
-  // Pre-select the duration the user actually searched for, if one was passed in
+
   var incomingHour = '{{ request('hour') }}';
+  @php
+    $incomingTimeRawValue = request('check_time') ?? request('checkInTime') ?? request('checkInTimes') ?? '';
+  @endphp
+  var incomingTimeRaw = {!! json_encode($incomingTimeRawValue) !!};
+
+  // Desktop duration
   if (incomingHour) {
-    var matchSlot = document.querySelector('.hd-bw-slot[data-hour="' + incomingHour + '"]');
+    var matchSlot = document.querySelector('#hdSlots .hd-bw-slot[data-hour="' + incomingHour + '"]');
     if (matchSlot && typeof hdSelectSlot === 'function') {
-      document.querySelectorAll('.hd-bw-slot').forEach(function(s) { s.classList.remove('active'); });
+      document.querySelectorAll('#hdSlots .hd-bw-slot').forEach(function(s) { s.classList.remove('active'); });
       matchSlot.classList.add('active');
       hdSelectSlot(matchSlot, parseFloat(matchSlot.dataset.price), matchSlot.dataset.hour);
     }
+
+    // Mobile drawer duration
+    var matchMobSlot = document.querySelector('#hdMobSlots .hd-bw-slot[data-hour="' + incomingHour + '"]');
+    if (matchMobSlot && typeof hdMobSlot === 'function') {
+      document.querySelectorAll('#hdMobSlots .hd-bw-slot').forEach(function(s) { s.classList.remove('active'); });
+      matchMobSlot.classList.add('active');
+      hdMobSlot(matchMobSlot, parseFloat(matchMobSlot.dataset.price), matchMobSlot.dataset.hour);
+    }
   }
+
+  // Convert "06:00 PM" / "18:00" to HH:mm.
+  function normalizeIncomingTime(raw) {
+    if (!raw) return '';
+    raw = String(raw).trim();
+
+    var twentyFour = raw.match(/^([01]?\d|2[0-3]):([0-5]\d)$/);
+    if (twentyFour) {
+      return String(twentyFour[1]).padStart(2, '0') + ':' + twentyFour[2];
+    }
+
+    var twelve = raw.match(/^(\d{1,2}):([0-5]\d)\s*(AM|PM)$/i);
+    if (!twelve) return '';
+
+    var h = parseInt(twelve[1], 10);
+    var m = twelve[2];
+    var p = twelve[3].toUpperCase();
+
+    if (p === 'PM' && h !== 12) h += 12;
+    if (p === 'AM' && h === 12) h = 0;
+
+    return String(h).padStart(2, '0') + ':' + m;
+  }
+
+  var incomingTime = normalizeIncomingTime(incomingTimeRaw);
+  if (incomingTime) {
+    var desktopTime = document.getElementById('hdTime');
+    var mobileTime = document.querySelector('#hdDrawer input[type="time"]');
+    if (desktopTime) desktopTime.value = incomingTime;
+    if (mobileTime) mobileTime.value = incomingTime;
+  }
+
+  if (typeof hdCalc === 'function') hdCalc();
+  if (typeof hdMCalc === 'function') hdMCalc();
 });
 
 function hdToggleAddon(label) {

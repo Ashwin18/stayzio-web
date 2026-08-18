@@ -1,0 +1,112 @@
+
+/* StayZio Footer Visibility Fix */
+body .stayzio-footer,
+html body .stayzio-footer {
+    background: #0B1F3A !important;
+    background-color: #0B1F3A !important;
+    color: #FFFFFF !important;
+    opacity: 1 !important;
+    position: relative !important;
+    overflow: hidden !important;
+}
+
+/* Remove decorative overlays/bars that are washing out the footer */
+body .stayzio-footer::before,
+body .stayzio-footer::after,
+body .stayzio-footer-inner::before,
+body .stayzio-footer-inner::after {
+    display: none !important;
+    content: none !important;
+}
+
+/* Make all footer content sit directly on navy background */
+body .stayzio-footer-inner,
+body .stayzio-footer-brand,
+body .stayzio-footer-col {
+    background: transparent !important;
+    background-color: transparent !important;
+    opacity: 1 !important;
+}
+
+/* Strong readable text */
+body .stayzio-footer,
+body .stayzio-footer p,
+body .stayzio-footer span,
+body .stayzio-footer li,
+body .stayzio-footer a {
+    color: rgba(255,255,255,.82) !important;
+    opacity: 1 !important;
+    text-shadow: none !important;
+}
+
+body .stayzio-footer h1,
+body .stayzio-footer h2,
+body .stayzio-footer h3,
+body .stayzio-footer h4,
+body .stayzio-footer h5,
+body .stayzio-footer h6 {
+    color: #FFFFFF !important;
+    opacity: 1 !important;
+}
+
+body .stayzio-footer-col h5 {
+    color: #FFFFFF !important;
+    font-weight: 800 !important;
+}
+
+body .stayzio-footer-col a:hover {
+    color: #63E2E2 !important;
+}
+
+/* Footer logo */
+body .stayzio-footer-logo > span {
+    display: none !important;
+}
+
+body .stayzio-footer-logo img {
+    width: 170px !important;
+    height: auto !important;
+    max-height: 50px !important;
+    object-fit: contain !important;
+    object-position: left center !important;
+    display: block !important;
+    opacity: 1 !important;
+    filter: brightness(0) invert(1) !important;
+}
+
+/* Social buttons */
+body .stayzio-socials a {
+    color: #FFFFFF !important;
+    background: rgba(255,255,255,.10) !important;
+    border: 1px solid rgba(255,255,255,.18) !important;
+    opacity: 1 !important;
+}
+
+body .stayzio-socials a:hover {
+    background: #00B8B8 !important;
+    border-color: #00B8B8 !important;
+}
+
+/* Remove any inherited light/beige footer wrappers */
+body footer.stayzio-footer > *,
+body footer.stayzio-footer .stayzio-footer-inner > * {
+    opacity: 1 !important;
+}
+
+/* Maintain clean spacing */
+body .stayzio-footer {
+    padding: 48px 0 34px !important;
+}
+
+body .stayzio-footer-inner {
+    width: min(1180px, calc(100% - 40px)) !important;
+    max-width: 1180px !important;
+    margin: 0 auto !important;
+    padding: 0 !important;
+}
+
+@media (max-width:600px) {
+    body .stayzio-footer {
+        padding: 38px 0 26px !important;
+    }
+}
